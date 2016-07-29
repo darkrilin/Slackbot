@@ -5,9 +5,6 @@ from slackclient import SlackClient
 
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get('SLACK_BOT_ID', 'U1WBVJF8A')
-BOT_NAME = 'brobot'
-
-# constants
 AT_BOT = "<@" + str(BOT_ID) + ">:"
 
 # instantiate Slack & Twilio clients
@@ -20,12 +17,17 @@ def handle_command(command, channel):
         are valid commands. If so, then acts on the commands. If not,
         returns back what it needs for clarification.
     """
-    response = "Not sure what you mean. Use the *" + EXAMPLE_COMMAND + \
-               "* command with numbers, delimited by spaces."
+    response = "I don't understand what you're tryna say, Bro"
     if command.startswith('test'):
-        response = "Sure...write some more code then I can do that!"
-    slack_client.api_call("chat.postMessage", channel=channel,
-                          text=response, as_user=True)
+        response = "Write some more code Bro, then I can do that!"
+    if command.startswith('spam'):
+        for i in range(20):
+            response = "Bro"
+            slack_client.api_call("chat.postMessage", channel=channel,
+                                  text=response, as_user=True)
+    else:
+        slack_client.api_call("chat.postMessage", channel=channel,
+                              text=response, as_user=True)
 
 
 def parse_slack_output(slack_rtm_output):
@@ -36,9 +38,10 @@ def parse_slack_output(slack_rtm_output):
     """
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
+        if output_list[0]['type'] != 'reconnect_url':
+            print(output_list)
+            print('')
         for output in output_list:
-            if 'text' in output:
-                print(output_list)
             if 'text' in output and AT_BOT in output['text']:
                 return output['text'].split(AT_BOT)[1].strip().lower(), output['channel']
     return None, None
