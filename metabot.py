@@ -11,13 +11,10 @@ def handle_command(command, channel):
     if command.startswith(':'):
         command = command[1::]
     response = choice(CONFUSED)
-    if command.startswith('debug_response'):
-        response = "This is a testy test"
-    elif command.startswith('debug_question_standard'):
-        response = ' , '.join(RANDOM)
-    elif command.startswith('debug_users'):
-        pprint(get_users())
+    if command.startswith('1'):
         response = ""
+        get_admins(True)
+        #response = ', '.join(get_users(True))
     else:
         text = command.replace('\n', ' ').replace('\r', '').lower()
         for p in PUNCTUATION:
@@ -45,15 +42,24 @@ def parse_slack_output(slack_rtm_output):
 
 
 # COMMANDS
-def get_users(justnames=True):
+def get_users(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
     if justnames == True:
         namelist = []
         for i in userlist['members']:
-            print(i['name'], i['id'])
-        return ""
+            namelist += [i['name']]
+        return namelist
     else:
         return userlist
+
+def get_admins(justnames=False):
+    userlist = slack_client.api_call('users.list', token=debug_token)
+    for i in userlist['members']:
+        if 'is_admin' in i.keys():
+            if i['is_admin'] == True:
+                pprint(i)
+        #if i['is_admin'] == True:
+        #    print(i)
 
 
 # MAIN
