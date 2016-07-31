@@ -17,14 +17,9 @@ def handle_command(command, channel):
         are valid commands. If so, then acts on the commands. If not,
         returns back what it needs for clarification.
     """
-    response = "I don't understand what you're tryna say, Bro"
+    response = "I don't understand"
     if command.startswith('test'):
-        response = "Write some more code Bro, then I can do that!"
-    if command.startswith('spam'):
-        for i in range(20):
-            response = "Bro"
-            slack_client.api_call("chat.postMessage", channel=channel,
-                                  text=response, as_user=True)
+        response = "Hello, World!"
     else:
         slack_client.api_call("chat.postMessage", channel=channel,
                               text=response, as_user=True)
