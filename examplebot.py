@@ -4,7 +4,7 @@ from slackclient import SlackClient
 
 
 # starterbot's ID as an environment variable
-BOT_ID = os.environ.get('SLACK_BOT_ID', 'U1WBVJF8A')
+BOT_ID = os.environ.get('SLACK_BOT_ID')
 AT_BOT = "<@" + str(BOT_ID) + ">:"
 
 # instantiate Slack & Twilio clients
@@ -18,11 +18,10 @@ def handle_command(command, channel):
         returns back what it needs for clarification.
     """
     response = "I don't understand"
-    if command.startswith('test'):
+    if 'hello' in command:
         response = "Hello, World!"
-    else:
-        slack_client.api_call("chat.postMessage", channel=channel,
-                              text=response, as_user=True)
+
+    slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 
 def parse_slack_output(slack_rtm_output):
@@ -45,12 +44,11 @@ def parse_slack_output(slack_rtm_output):
 if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
-        print("BroBot connected and running! " + str(AT_BOT))
+        print("Slack bot connected and running! " + str(AT_BOT))
         while True:
             command, channel = parse_slack_output(slack_client.rtm_read())
             if command and channel:
                 handle_command(command, channel)
             time.sleep(READ_WEBSOCKET_DELAY)
-        print("Disconnected")
     else:
         print("Connection failed. Invalid Slack token or bot ID?")

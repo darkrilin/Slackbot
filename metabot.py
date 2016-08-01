@@ -63,22 +63,20 @@ def get_admins(justnames=False):
     for i in userlist['members']:
         if 'is_admin' in i.keys():
             if i['is_admin'] == True:
-                #pprint(i)
                 namelist += [i['name']]
     return namelist
-        #if i['is_admin'] == True:
-        #    print(i)
 
 def is_admin(name):
     name = name.replace('is_admin ','')
-    if name == 'god':
-        return "What do you think?"
-    else:
+    if name in get_users(True):
         return name in get_admins(True)
+    else:
+        return '*"WHO IS THIS ' + name.upper() + ' YOU SPEAK OF"*'
+
 
 # MAIN
 if __name__ == "__main__":
-    BOT_ID = os.environ.get('SLACK_BOT_ID', 'U1WBVJF8A')
+    BOT_ID = os.environ.get('SLACK_BOT_ID')#, 'U1WBVJF8A')
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
     slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
