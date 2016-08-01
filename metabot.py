@@ -11,10 +11,13 @@ def handle_command(command, channel):
     if command.startswith(':'):
         command = command[1::]
     response = choice(CONFUSED)
-    if command.startswith('1'):
-        response = ""
-        get_admins(True)
-        #response = ', '.join(get_users(True))
+    if command.startswith('get_admins'):
+        response = ', '.join(get_admins(True))
+        #get_users(True))
+    elif command.startswith('is_admin'):
+        response = is_admin(command)
+    elif command.startswith('get_users'):
+        response = ', '.join(get_users(True))
     else:
         text = command.replace('\n', ' ').replace('\r', '').lower()
         for p in PUNCTUATION:
@@ -54,13 +57,22 @@ def get_users(justnames=False):
 
 def get_admins(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
+    namelist = []
     for i in userlist['members']:
         if 'is_admin' in i.keys():
             if i['is_admin'] == True:
-                pprint(i)
+                #pprint(i)
+                namelist += [i['name']]
+    return namelist
         #if i['is_admin'] == True:
         #    print(i)
 
+def is_admin(name):
+    name = name.replace('is_admin ','')
+    if name == 'god':
+        return "What do you think?"
+    else:
+        return name in get_admins(True)
 
 # MAIN
 if __name__ == "__main__":
