@@ -18,6 +18,8 @@ def handle_command(command, channel):
         response = is_admin(command)
     elif command.startswith('get_users'):
         response = ', '.join(get_users(True))
+    elif command.startswith('goodbye'):
+        response = "NOOO! PLEASE DON'T LEAVE!!!"
     else:
         text = command.replace('\n', ' ').replace('\r', '').lower()
         for p in PUNCTUATION:
