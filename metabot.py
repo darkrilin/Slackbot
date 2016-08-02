@@ -6,33 +6,29 @@ from random import choice
 from slackclient import SlackClient
 
 
+
 # SLACK FUNCTIONS
-def handle_command(command, channel):
+def handle_command(command, channel, caller):
     if command.startswith(':'):
         command = command[1::]
     response = choice(CONFUSED)
-    if command.startswith('get_admins'):
-        response = ', '.join(get_admins(True))
-        #get_users(True))
-    elif command.startswith('is_admin'):
-        command = command.replace('is_admin ','')
-        response = is_admin(command)[1]
-    elif command.startswith('get_users'):
-        response = ', '.join(get_users(True))
-    elif command.startswith('get_name'):
-        command = command.replace('get_name ', '')
-        response = name_from_id(command)[1]
-    elif command.startswith('get_id'):
-        command = command.replace('get_id ', '')
-        response = id_from_name(command)[1]
-    else:
-        text = command.replace('\n', ' ').replace('\r', '').lower()
-        for p in PUNCTUATION:
-            text = text.replace(p, '')
-        text = text.split(' ')
-        text.sort()
-        print(text)
-        response = choice(CONFUSED)
+    if name_from_id(caller)[1] in get_admins(True):
+        if command.startswith('get_admins'):
+            response = ', '.join(get_admins(True))
+        elif command.startswith('is_admin'):
+            command = command.replace('is_admin ','')
+            response = is_admin(command)[1]
+        elif command.startswith('get_users'):
+            response = ', '.join(get_users(True))
+        elif command.startswith('get_name'):
+            command = command.replace('get_name ', '')
+            response = name_from_id(command)[1]
+        elif command.startswith('get_id'):
+            command = command.replace('get_id ', '')
+            response = id_from_name(command)[1]
+        elif command.startswith('welcome_test'):
+            command = command.replace('welcome_test ', '')
+            response = welcome(command, channel)
         
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
@@ -44,14 +40,30 @@ def parse_slack_output(slack_rtm_output):
             print('')
         for output in output_list:
             if 'text' in output:
+                if 'subtype' in output and 'channel' in output:
+                    if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == 'C07EK648H':
+                        welcome(output['user'], output['channel'])
+                        return None, None, None
                 if AT_BOT in output['text']:
-                    return output['text'].split(AT_BOT)[1].strip().lower(), output['channel']
+                    return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                 elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
-                    return output['text'].strip().lower(), output['channel']
-    return None, None
+                    return output['text'].strip().lower(), output['channel'], output['user']
+            
+    return None, None, None
+
+
 
 
 # COMMANDS
+def welcome(userid, channel):
+    slack_client.api_call('chat.postMessage', channel=channel,
+                          text="```Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here: \n\
+\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise. \
+\n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, \
+and if they wander off somewhere interesting then it's not a big deal. \
+\n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' and ' + get_admins(True)[-1] + '.```', as_user=True)
+    return ''
+
 def get_users(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
     if justnames == True:
@@ -105,9 +117,11 @@ def id_from_name(username):
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
 
 
+
+
 # MAIN
 if __name__ == "__main__":
-    BOT_ID = os.environ.get('SLACK_BOT_ID')#, 'U1WBVJF8A')
+    BOT_ID = os.environ.get('SLACK_BOT_ID')
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
     slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -125,9 +139,9 @@ if __name__ == "__main__":
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         while True:
-            command, channel = parse_slack_output(slack_client.rtm_read())
+            command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
-                handle_command(command, channel)
+                handle_command(command, channel, caller)
             sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
