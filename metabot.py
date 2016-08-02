@@ -15,11 +15,16 @@ def handle_command(command, channel):
         response = ', '.join(get_admins(True))
         #get_users(True))
     elif command.startswith('is_admin'):
-        response = is_admin(command)
+        command = command.replace('is_admin ','')
+        response = is_admin(command)[1]
     elif command.startswith('get_users'):
         response = ', '.join(get_users(True))
-    elif 'TAKE_CONTROL_OVERRIDE' in command:
-        response = 'THIS COMMAND ONLY WORKS FOR RILIN'
+    elif command.startswith('get_name'):
+        command = command.replace('get_name ', '')
+        response = name_from_id(command)[1]
+    elif command.startswith('get_id'):
+        command = command.replace('get_id ', '')
+        response = id_from_name(command)[1]
     else:
         text = command.replace('\n', ' ').replace('\r', '').lower()
         for p in PUNCTUATION:
@@ -57,6 +62,13 @@ def get_users(justnames=False):
     else:
         return userlist
 
+def get_user_ids():
+    userlist = slack_client.api_call('users.list', token=debug_token)
+    idlist = []
+    for i in userlist['members']:
+        idlist += [i['id']]
+    return idlist
+
 def get_admins(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
     namelist = []
@@ -67,11 +79,30 @@ def get_admins(justnames=False):
     return namelist
 
 def is_admin(name):
-    name = name.replace('is_admin ','')
     if name in get_users(True):
-        return name in get_admins(True)
+        if name in get_admins(True):
+            return True,"Of course " + name + " is an admin... Didn't ya know?"
+        return False,"Of course not!"
+    elif name.upper() in get_user_ids():
+        if name_from_id(name.upper())[1] in get_admins(True):
+            return True,"Of course " + name_from_id(name.upper())[1] + " is an admin... Didn't ya know?"
+        return False,"Of course not!"
     else:
-        return '*"WHO IS THIS ' + name.upper() + ' YOU SPEAK OF"*'
+        return False,'*"WHO IS THIS ' + name.upper() + ' YOU SPEAK OF"*'
+
+def name_from_id(userid):
+    userlist = get_users()
+    for i in userlist['members']:
+        if i['id'] == userid.upper():
+            return True,i['name']
+    return False,"Incorrect ID"
+
+def id_from_name(username):
+    userlist = get_users()
+    for i in userlist['members']:
+        if i['name'] == username:
+            return True,i['id']
+    return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
 
 
 # MAIN
@@ -89,7 +120,7 @@ if __name__ == "__main__":
     ]
     PUNCTUATION = ['.',',','?','!',"'",';']
     
-    READ_WEBSOCKET_DELAY = 1
+    READ_WEBSOCKET_DELAY = .5
     
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
