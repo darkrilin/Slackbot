@@ -1,1 +1,1 @@
-bot: python metabot.py -p $PORT
+bot: python metabot.py
