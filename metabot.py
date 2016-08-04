@@ -32,9 +32,6 @@ def handle_command(command, channel, caller):
 def parse_slack_output(slack_rtm_output):
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
-        if output_list[0]['type'] == 'message':
-            print(output_list)
-            print('')
         for output in output_list:
             if 'text' in output:
                 if 'subtype' in output and 'channel' in output:
