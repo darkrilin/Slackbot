@@ -26,6 +26,8 @@ def handle_command(command, channel, caller):
         elif command.startswith('welcome_test'):
             command = command.replace('welcome_test ', '')
             response = welcome(command, channel)
+    if 'tell' in command and 'joke' in command:
+        response = choice(JOKES)
 
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
@@ -133,6 +135,26 @@ if __name__ == "__main__":
     GREETINGS = [
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
         "Welcome to the motherland, comrade!", "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!"
+    ]
+    JOKES = [
+	"There are only 10 types of people in the world: those that understand binary and those that don’t.",
+	"Failure is not an option. It comes bundled with your Microsoft product.",
+	"I’m not anti-social; I’m just not user friendly.",
+	"My attitude isn’t bad. It’s in beta.",
+	"Latest survey shows that 3 out of 4 people make up 75% of the world’s population.",
+	"What do you get when you cross a cow and a trampoline? A milkshake.",
+	"Mother, “How was school today, Patrick?”\n\nPatrick, “It was really great mum! Today we made explosives!”\n\nMother, “Ooh, they do very fancy stuff with you these days. And what will you do at school tomorrow?”\n\nPatrick, “What school?”",
+	'Police officer: "Can you identify yourself, sir?"\n\nDriver pulls out his mirror and says: "Yes, '+"it's me."+'"',
+	"I can’t believe I forgot to go to the gym today. That’s 7 years in a row now.",
+	"A naked woman robbed a bank. Nobody could remember her face.",
+	"The 21st century: Deleting history is often more important than making it.",
+	"Woke up with a dead leg this morning. I will not take out a loan with the mafia ever again.",
+	"Why do cows wear bells?\n\nTheir horns don’t work.",
+	"Why haven’t you ever seen any elephants hiding up trees? Because they’re really, really good at it.",
+	"I asked my North Korean friend how it was to live in North Korea. He said he can't complain.",
+	"Q: How many programmers does it take to change a light bulb?\n\nA: None, that's a hardware problem.",
+	"Where's the best place to hide a body?\n\nPage two of Google.",
+	"I love pressing F5. It's so refreshing."
     ]
 
     READ_WEBSOCKET_DELAY = .5
