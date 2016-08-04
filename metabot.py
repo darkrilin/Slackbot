@@ -1,6 +1,4 @@
 import os
-import pickle
-from pprint import pprint
 from time import sleep
 from random import choice
 from slackclient import SlackClient
@@ -28,7 +26,7 @@ def handle_command(command, channel, caller):
         elif command.startswith('welcome_test'):
             command = command.replace('welcome_test ', '')
             response = welcome(command, channel)
-        
+
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 def parse_slack_output(slack_rtm_output):
@@ -47,7 +45,7 @@ def parse_slack_output(slack_rtm_output):
                     return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                 elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                     return output['text'].strip().lower(), output['channel'], output['user']
-            
+
     return None, None, None
 
 
@@ -123,8 +121,9 @@ def id_from_name(username):
 
 # MAIN
 if __name__ == "__main__":
-    exec(open("./environment.py").read())
-    
+    print()
+    exec(open(os.path.dirname(__file__)+"/environment.py").read())
+
     BOT_ID = os.environ.get('SLACK_BOT_ID')
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
@@ -140,9 +139,9 @@ if __name__ == "__main__":
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
         "Welcome to the motherland, comrade!", "Oh, hello X!"
     ]
-    
+
     READ_WEBSOCKET_DELAY = .5
-    
+
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         while True:
