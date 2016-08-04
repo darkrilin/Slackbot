@@ -121,9 +121,6 @@ def id_from_name(username):
 
 # MAIN
 if __name__ == "__main__":
-    print()
-    exec(open(os.path.dirname(__file__)+"/environment.py").read())
-
     BOT_ID = os.environ.get('SLACK_BOT_ID')
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
@@ -137,7 +134,7 @@ if __name__ == "__main__":
     ]
     GREETINGS = [
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
-        "Welcome to the motherland, comrade!", "Oh, hello X!"
+        "Welcome to the motherland, comrade!", "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!"
     ]
 
     READ_WEBSOCKET_DELAY = .5
