@@ -1,1 +1,1 @@
-web: python metabot.py -p 403
+bot: python metabot.py -p $PORT
