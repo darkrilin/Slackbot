@@ -55,13 +55,15 @@ def parse_slack_output(slack_rtm_output):
 
 # COMMANDS
 def welcome(userid, channel):
+    userid = userid.upper()
+    slack_client.api_call('chat.postMessage', channel=channel, text=choice(GREETINGS).replace('X',name_from_id(userid)[1]), as_user=True)
     slack_client.api_call('chat.postMessage', channel=userid,
-                          text="```Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here: \n\
+                          text="Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here: \n\
 \n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise. \
 \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, \
 and if they wander off somewhere interesting then it's not a big deal. \
 \n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' and ' + get_admins(True)[-1] + '. \
-\n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off```')
+\n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off', as_user=True)
     return ''
 
 def get_users(justnames=False):
@@ -131,6 +133,10 @@ if __name__ == "__main__":
         "I'm not really sure what you mean", "I'm not sure what you're saying", "I don't understand",
         "What do you mean?", "I'm not sure I understand", "What are you saying?", "Huh?", "¯\_(ツ)_/¯",
         "What are you trying to say?", "What does that mean?", "Could you explain?", "What?"
+    ]
+    GREETINGS = [
+        "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
+        "Welcome to the motherland, comrade!", "Oh, hello X!"
     ]
     
     READ_WEBSOCKET_DELAY = .5
