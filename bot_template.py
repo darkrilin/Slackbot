@@ -3,14 +3,6 @@ import time
 from slackclient import SlackClient
 
 
-# starterbot's ID as an environment variable
-BOT_ID = os.environ.get('SLACK_BOT_ID')
-AT_BOT = "<@" + str(BOT_ID) + ">:"
-
-# instantiate Slack & Twilio clients
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
-
-
 def handle_command(command, channel):
     """
         Receives commands directed at the bot and determines if they
@@ -42,6 +34,17 @@ def parse_slack_output(slack_rtm_output):
 
 
 if __name__ == "__main__":
+    
+    exec(open("./environment.py").read())
+    
+    # starterbot's ID as an environment variable
+    BOT_ID = os.environ.get('SLACK_BOT_ID')
+    AT_BOT = "<@" + str(BOT_ID) + ">:"
+
+    # instantiate Slack & Twilio clients
+    slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+    
+
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Slack bot connected and running! " + str(AT_BOT))

@@ -123,6 +123,8 @@ def id_from_name(username):
 
 # MAIN
 if __name__ == "__main__":
+    exec(open("./environment.py").read())
+    
     BOT_ID = os.environ.get('SLACK_BOT_ID')
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
