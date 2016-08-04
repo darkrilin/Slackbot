@@ -38,10 +38,11 @@ def parse_slack_output(slack_rtm_output):
                     if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == 'C07EK648H':
                         welcome(output['user'], output['channel'])
                         return None, None, None
-                if AT_BOT in output['text']:
-                    return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
-                elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
-                    return output['text'].strip().lower(), output['channel'], output['user']
+                if 'user' in output:
+                    if AT_BOT in output['text']:
+                        return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
+                    elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
+                        return output['text'].strip().lower(), output['channel'], output['user']
 
     return None, None, None
 
