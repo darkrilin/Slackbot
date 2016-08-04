@@ -121,11 +121,11 @@ def id_from_name(username):
 
 # MAIN
 if __name__ == "__main__":
-    BOT_ID = os.environ.get('SLACK_BOT_ID')
+    BOT_ID = os.environ['SLACK_BOT_ID']
     AT_BOT = "<@" + str(BOT_ID) + ">"
 
-    slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
-    debug_token = os.environ.get('SLACK_TEST_TOKEN')
+    slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
+    debug_token = os.environ['SLACK_TEST_TOKEN']
 
     CONFUSED = [
         "I'm not really sure what you mean", "I'm not sure what you're saying", "I don't understand",
