@@ -9,6 +9,19 @@ def handle_command(command, channel, caller):
     if command.startswith(':'):
         command = command[1::]
     response = choice(CONFUSED)
+    if command.startswith('test'):
+        if name_from_id(caller)[1] in get_admins(True):
+            command = command.replace('test ', '')
+            if command.startswith('welcome'):
+                response = welcome(command, channel)
+    elif command.startswith('help'):
+        command = command.replace('help', '').replace(' ', '')
+        response = command
+    elif command.startswith('ping'):
+        response = 'Pong!'
+    elif 'tell' in command and 'joke' in command:
+        response = choice(JOKES)
+    """
     if name_from_id(caller)[1] in get_admins(True):
         if command.startswith('get_admins'):
             response = ', '.join(get_admins(True))
@@ -24,10 +37,8 @@ def handle_command(command, channel, caller):
             command = command.replace('get_id ', '')
             response = id_from_name(command)[1]
         elif command.startswith('welcome_test'):
-            command = command.replace('welcome_test ', '')
-            response = welcome(command, channel)
-    if 'tell' in command and 'joke' in command:
-        response = choice(JOKES)
+            
+    """
 
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
