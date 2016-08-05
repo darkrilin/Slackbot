@@ -13,7 +13,20 @@ def handle_command(command, channel, caller):
         if name_from_id(caller)[1] in get_admins(True):
             command = command.replace('test ', '')
             if command.startswith('welcome'):
+                command = command.replace('welcome ', '')
                 response = welcome(command, channel)
+    elif command.startswith('get'):
+        if name_from_id(caller)[1] in get_admins(True):
+            if 'admin' in command:
+                response = ', '.join(get_admins(True))
+            elif 'user' in command:
+                response = ', '.join(get_users(True))
+            elif 'name' in command:
+                command = command.split(' ')[-1]
+                response = name_from_id(command)[1]
+            elif 'id' in command:
+                command = command.split(' ')[-1]
+                response = id_from_name(command)[1]
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
         response = command
@@ -21,24 +34,6 @@ def handle_command(command, channel, caller):
         response = 'Pong!'
     elif 'tell' in command and 'joke' in command:
         response = choice(JOKES)
-    """
-    if name_from_id(caller)[1] in get_admins(True):
-        if command.startswith('get_admins'):
-            response = ', '.join(get_admins(True))
-        elif command.startswith('is_admin'):
-            command = command.replace('is_admin ','')
-            response = is_admin(command)[1]
-        elif command.startswith('get_users'):
-            response = ', '.join(get_users(True))
-        elif command.startswith('get_name'):
-            command = command.replace('get_name ', '')
-            response = name_from_id(command)[1]
-        elif command.startswith('get_id'):
-            command = command.replace('get_id ', '')
-            response = id_from_name(command)[1]
-        elif command.startswith('welcome_test'):
-            
-    """
 
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
@@ -145,7 +140,8 @@ if __name__ == "__main__":
     ]
     GREETINGS = [
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
-        "Welcome to the motherland, comrade!", "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!"
+        "Welcome to the motherland, comrade!", "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
+        "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
     ]
     JOKES = [
 	"There are only 10 types of people in the world: those that understand binary and those that don’t.",
@@ -165,10 +161,18 @@ if __name__ == "__main__":
 	"I asked my North Korean friend how it was to live in North Korea. He said he can't complain.",
 	"Q: How many programmers does it take to change a light bulb?\n\nA: None, that's a hardware problem.",
 	"Where's the best place to hide a body?\n\nPage two of Google.",
-	"I love pressing F5. It's so refreshing."
+	"I love pressing F5. It's so refreshing.",
+        "Anyone can build a bridge that doesn't fall down. Only an engineer can build a bridge that just barely doesn't fall down.",
+        'Three statisticians go hunting. They see a deer and the first one shoots, hitting three feet left of the deer. The second one shoots, hitting three feet right of the deer. The third one leaps up in joy, yelling, "we got him!"',
+        "Standard Deviation not enough for Perverted Statistician",
+        "Any salad is a Caesar salad if you stab it enough",
+        "If I got $1 every time somebody called me a racist... Black people would rob me",
+        "I have an EpiPen. My friend gave it to me as he was dying. It seemed very important to him that I have it.",
+        "Why are gay men so well dressed?\n\nThey didn't spend all that time in the closet doing nothing.",
+        "What's a pirate's least favourite letter?\n\n```Dear Sir,\nWe are writing to you because you have violated copyright...```"
     ]
 
-    READ_WEBSOCKET_DELAY = .5
+    READ_WEBSOCKET_DELAY = 1
 
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
