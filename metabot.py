@@ -15,6 +15,10 @@ def handle_command(command, channel, caller):
             if command.startswith('welcome'):
                 command = command.replace('welcome ', '')
                 response = welcome(command, channel)
+            else:
+                response = get_help(True, 'test')
+        else:
+            response = "You aren't allowed to do that."
     elif command.startswith('get'):
         if name_from_id(caller)[1] in get_admins(True):
             if 'admin' in command:
@@ -27,12 +31,16 @@ def handle_command(command, channel, caller):
             elif 'id' in command:
                 command = command.split(' ')[-1]
                 response = id_from_name(command)[1]
+            else:
+                response = get_help(True, 'get')
+        else:
+            response = "You aren't allowed to do that."
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
-        response = command
+        response = get_help(is_admin(name_from_id(caller)[1]), command)
     elif command.startswith('ping'):
         response = 'Pong!'
-    elif 'tell' in command and 'joke' in command:
+    elif 'joke' in command:
         response = choice(JOKES)
 
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
@@ -47,6 +55,8 @@ def parse_slack_output(slack_rtm_output):
                         welcome(output['user'], output['channel'])
                         return None, None, None
                 if 'user' in output:
+                    print()
+                    print(output)
                     if AT_BOT in output['text']:
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                     elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
@@ -69,6 +79,30 @@ and if they wander off somewhere interesting then it's not a big deal. \
 \n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' and ' + get_admins(True)[-1] + '. \
 \n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off', as_user=True)
     return ''
+
+def get_help(admin=False, subcommand=""):
+    if admin:
+        if subcommand == "":
+            return "```Commands:\
+\nhelp  -  shows a list of commands (duh!) \
+\nping  -  pings the bot host\njoke  -  tells a joke \
+\ntest* -  testing bot functions\nget*  -  get slack status values \
+\n\n* type 'help command' to view full command```"
+        else:
+            if subcommand == "get":
+                return "```Fetches data from the slack client\nUsage: get [admins|users|name|id] (value)```"
+            elif subcommand == "test":
+                return "```Tests bot system commands\nUsage: test [welcome]```"
+            else:
+                return "Can't find command: " + subcommand
+    else:
+        if subcommand == "":
+            return "```Commands:\
+\nhelp  -  shows a list of commands (duh!) \
+\nping  -  pings the bot host\njoke  -  tells a joke```"
+        else:
+            return "Can't find command: " + subcommand
+            
 
 def get_users(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
@@ -169,7 +203,9 @@ if __name__ == "__main__":
         "If I got $1 every time somebody called me a racist... Black people would rob me",
         "I have an EpiPen. My friend gave it to me as he was dying. It seemed very important to him that I have it.",
         "Why are gay men so well dressed?\n\nThey didn't spend all that time in the closet doing nothing.",
-        "What's a pirate's least favourite letter?\n\n```Dear Sir,\nWe are writing to you because you have violated copyright...```"
+        "What's a pirate's least favourite letter?\n\n```Dear Sir,\nWe are writing to you because you have violated copyright...```",
+        "I started a company selling land mines that look like prayer mats. Prophets are going through the roof.",
+        'So a gorilla dies at a zoo right before the zoo opens. It is the only gorilla at the zoo since they are not very profitable. However, the gorilla is their most popular attraction by far, and they cannot afford to go a day without it. So the zoo owner asks one of his workers to wear a gorilla suit they have in storage for an extra $100 a day if he will go in the gorilla cage and pretend to be the gorilla until the zoo can afford a new one.\n\nQuickly, the new "gorilla" becomes the most popular craze at the zoo. People from all over are coming to see the "Human-like" gorilla. About a month in, the craze has started to wear off. So, to get peoples attention back, he decides to climb over his enclosure and hang from the net ceiling above the lions den next to him. A large crowd of people gather watching the spectacle in awe and terror. Suddenly the man loses his grip and falls to the floor of the lions den. The man starts screaming "HELP!! HELP!!!" Suddenly a lion pounces him from behind and whispers in his ear, "Shut the fuck up right now or you'+"'"+'re going to get us both fired."'
     ]
 
     READ_WEBSOCKET_DELAY = 1
