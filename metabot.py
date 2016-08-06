@@ -22,12 +22,18 @@ def handle_command(command, channel, caller):
     elif command.startswith('get'):
         if name_from_id(caller)[1] in get_admins(True):
             if 'admin' in command:
-                response = ', '.join(get_admins(True))
+                response = get_admins(True)
             elif 'user' in command:
-                response = ', '.join(get_users(True))
+                response = get_users(True)
             elif 'name' in command:
                 command = command.split(' ')[-1]
                 response = name_from_id(command)[1]
+            elif 'channel' in command:
+                command = command.replace('get ','').replace('channel','').split(' ')
+                if len(command) == 1:
+                    response = [i[0] for i in get_channels(True)]
+                else:
+                    response = get_channels(True, command[-1])
             elif 'id' in command:
                 command = command.split(' ')[-1]
                 response = id_from_name(command)[1]
@@ -51,7 +57,7 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
             if 'text' in output:
                 if 'subtype' in output and 'channel' in output:
-                    if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == 'C07EK648H':
+                    if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == get_channels(True, 'general')[1]:
                         welcome(output['user'], output['channel'])
                         return None, None, None
                 if 'user' in output:
@@ -90,7 +96,7 @@ def get_help(admin=False, subcommand=""):
 \n\n* type 'help command' to view full command```"
         else:
             if subcommand == "get":
-                return "```Fetches data from the slack client\nUsage: get [admins|users|name|id] (value)```"
+                return "```Fetches data from the slack client\nUsage: get [admins|users|name|channel|id] (value)```"
             elif subcommand == "test":
                 return "```Tests bot system commands\nUsage: test [welcome]```"
             else:
@@ -103,6 +109,22 @@ def get_help(admin=False, subcommand=""):
         else:
             return "Can't find command: " + subcommand
             
+def get_channels(justnames=False, channel=""):
+    userlist = slack_client.api_call('channels.list', token=debug_token)
+    if channel == "":
+        if justnames == True:
+            namelist = []
+            for i in userlist['channels']:
+                if i['is_archived'] == False:
+                    namelist += [(i['name'], i['id'])]
+            return namelist
+        else:
+            return userlist
+    else:
+        for i in get_channels(True):
+            if channel == i[0] or channel.upper() == i[1]:
+                return i[0], i[1]
+        return False
 
 def get_users(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
@@ -208,8 +230,7 @@ if __name__ == "__main__":
         'So a gorilla dies at a zoo right before the zoo opens. It is the only gorilla at the zoo since they are not very profitable. However, the gorilla is their most popular attraction by far, and they cannot afford to go a day without it. So the zoo owner asks one of his workers to wear a gorilla suit they have in storage for an extra $100 a day if he will go in the gorilla cage and pretend to be the gorilla until the zoo can afford a new one.\n\nQuickly, the new "gorilla" becomes the most popular craze at the zoo. People from all over are coming to see the "Human-like" gorilla. About a month in, the craze has started to wear off. So, to get peoples attention back, he decides to climb over his enclosure and hang from the net ceiling above the lions den next to him. A large crowd of people gather watching the spectacle in awe and terror. Suddenly the man loses his grip and falls to the floor of the lions den. The man starts screaming "HELP!! HELP!!!" Suddenly a lion pounces him from behind and whispers in his ear, "Shut the fuck up right now or you'+"'"+'re going to get us both fired."'
     ]
 
-    READ_WEBSOCKET_DELAY = 1
-
+    READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         while True:
