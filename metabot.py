@@ -208,7 +208,7 @@ def check_studio_update(getval=False):
         return isupdate,response
     else:
         if isupdate:
-            slack_client.api_call("chat.postMessage", channel='bot-testing', text=response, as_user=True)
+            slack_client.api_call("chat.postMessage", channel='general', text=response, as_user=True)
         return ""
 
 
