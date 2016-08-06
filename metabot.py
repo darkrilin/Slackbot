@@ -230,7 +230,7 @@ if __name__ == "__main__":
     ]
     GREETINGS = [
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
-        "Welcome to the motherland, comrade!", "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
+        "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
         "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
     ]
     JOKES = [
