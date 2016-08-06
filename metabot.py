@@ -1,7 +1,11 @@
 import os
+import schedule
+from urllib import request
+from ast import literal_eval
 from time import sleep
 from random import choice
 from slackclient import SlackClient
+from datetime import datetime
 
 
 # SLACK FUNCTIONS
@@ -15,6 +19,8 @@ def handle_command(command, channel, caller):
             if command.startswith('welcome'):
                 command = command.replace('welcome ', '')
                 response = welcome(command, channel)
+            elif 'studio' in command and 'update' in command:
+                response = check_studio_update(True)[1]
             else:
                 response = get_help(True, 'test')
         else:
@@ -178,6 +184,34 @@ def id_from_name(username):
             return True,i['id']
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
 
+def check_studio_update(getval=False):
+    urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
+    isupdate = False
+    response = "*No updates available*\n"
+    for i in urls:
+        source = literal_eval(str(request.urlopen(i).read())[2:-1])
+        if isupdate == False:
+            for i in source:
+                name = i
+                daysago = source[name]['daysAgo']
+                if daysago == '0':
+                    isupdate = True
+                    if name == 'gmstudio':
+                        response = "Update for GameMaker:Studio! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
+                    elif name == 'gmstudiobeta':
+                        response = "Update for GameMaker:Studio *Beta*! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
+                    elif name == 'gmstudioea':
+                        response = "Update for GameMaker:Studio Early Access. http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
+                else:
+                    response += str(name) + " last updated " + str(daysago) + " days ago\n"
+    if getval:
+        return isupdate,response
+    else:
+        if isupdate:
+            slack_client.api_call("chat.postMessage", channel='bot-testing', text=response, as_user=True)
+        return ""
+
+
 
 
 
@@ -230,10 +264,13 @@ if __name__ == "__main__":
         'So a gorilla dies at a zoo right before the zoo opens. It is the only gorilla at the zoo since they are not very profitable. However, the gorilla is their most popular attraction by far, and they cannot afford to go a day without it. So the zoo owner asks one of his workers to wear a gorilla suit they have in storage for an extra $100 a day if he will go in the gorilla cage and pretend to be the gorilla until the zoo can afford a new one.\n\nQuickly, the new "gorilla" becomes the most popular craze at the zoo. People from all over are coming to see the "Human-like" gorilla. About a month in, the craze has started to wear off. So, to get peoples attention back, he decides to climb over his enclosure and hang from the net ceiling above the lions den next to him. A large crowd of people gather watching the spectacle in awe and terror. Suddenly the man loses his grip and falls to the floor of the lions den. The man starts screaming "HELP!! HELP!!!" Suddenly a lion pounces him from behind and whispers in his ear, "Shut the fuck up right now or you'+"'"+'re going to get us both fired."'
     ]
 
+    schedule.every().day.at('19:30').do(check_studio_update)
+
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         while True:
+            schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
                 handle_command(command, channel, caller)
