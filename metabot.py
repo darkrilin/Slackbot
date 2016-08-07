@@ -19,7 +19,7 @@ def handle_command(command, channel, caller):
             if command.startswith('welcome'):
                 command = command.replace('welcome ', '')
                 response = welcome(command, channel)
-            elif 'studio' in command and 'update' in command:
+            elif 'update' in command:
                 response = check_studio_update(True)[1]
             else:
                 response = get_help(True, 'test')
@@ -104,7 +104,7 @@ def get_help(admin=False, subcommand=""):
             if subcommand == "get":
                 return "```Fetches data from the slack client\nUsage: get [admins|users|name|channel|id] (value)```"
             elif subcommand == "test":
-                return "```Tests bot system commands\nUsage: test [welcome]```"
+                return "```Tests bot system commands\nUsage: test [welcome|update]```"
             else:
                 return "Can't find command: " + subcommand
     else:
