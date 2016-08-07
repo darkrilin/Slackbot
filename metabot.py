@@ -197,11 +197,11 @@ def check_studio_update(getval=False):
                 if daysago == '0':
                     isupdate = True
                     if name == 'gmstudio':
-                        response = "Update for GameMaker:Studio! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
+                        response = "GameMaker:Studio updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
                     elif name == 'gmstudiobeta':
-                        response = "Update for GameMaker:Studio *Beta*! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
+                        response = "GameMaker:Studio *Beta* updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
                     elif name == 'gmstudioea':
-                        response = "Update for GameMaker:Studio Early Access. http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
+                        response = "GameMaker:Studio Early Access updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
                 else:
                     response += str(name) + " last updated " + str(daysago) + " days ago\n"
     if getval:
