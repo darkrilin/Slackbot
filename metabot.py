@@ -92,6 +92,9 @@ and if they wander off somewhere interesting then it's not a big deal. \
 \n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off', as_user=True)
     return ''
 
+def ping():
+    slack_client.api_call("chat.postMessage", channel='G1WARM8QM', text="Ping!", as_user=True)
+
 def get_help(admin=False, subcommand=""):
     if admin:
         if subcommand == "":
@@ -237,6 +240,7 @@ if __name__ == "__main__":
         JOKES = file.read().split('\n')
 
     schedule.every().day.at('19:30').do(check_studio_update)
+    schedule.every(10).minutes.do(ping)
 
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
