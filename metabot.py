@@ -236,10 +236,14 @@ if __name__ == "__main__":
         "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
         "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
     ]
-    with open('staticfiles/jokes.txt') as file:
-        JOKES = file.read().split('\n')
+    JOKES = [
+        "Hey, kid. I don't do humour any more...", "What, do you think I'm a clown?", "I don't tell jokes",
+        "I'm all outta jokes.", "I'm sorry, but there will be no more jokes. Robots can't do humour.",
+        "I'm a robot, not a comedian. Please stop asking me to tell jokes."
+    ]
 
     schedule.every().day.at('19:30').do(check_studio_update)
+    ping()
     schedule.every(10).minutes.do(ping)
 
     READ_WEBSOCKET_DELAY = .5
