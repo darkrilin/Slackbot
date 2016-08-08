@@ -244,7 +244,7 @@ if __name__ == "__main__":
 
     schedule.every().day.at('19:30').do(check_studio_update)
     ping()
-    schedule.every(10).minutes.do(ping)
+    schedule.every(1).minutes.do(ping)
 
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
