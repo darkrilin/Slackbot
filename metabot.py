@@ -243,12 +243,11 @@ if __name__ == "__main__":
     ]
 
     schedule.every().day.at('19:30').do(check_studio_update)
-    ping()
-    schedule.every(1).minutes.do(ping)
 
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
+        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta starting up...", as_user=True)
         while True:
             schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
