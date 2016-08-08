@@ -233,7 +233,7 @@ if __name__ == "__main__":
         "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
         "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
     ]
-    with open('jokes.txt') as file:
+    with open('staticfiles/jokes.txt') as file:
         JOKES = file.read().split('\n')
 
     schedule.every().day.at('19:30').do(check_studio_update)
