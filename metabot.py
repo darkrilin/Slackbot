@@ -2,7 +2,7 @@ import os
 import schedule
 from urllib import request
 from ast import literal_eval
-from time import sleep
+from time import sleep, strftime, gmtime
 from random import choice
 from slackclient import SlackClient
 from datetime import datetime
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
-        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta starting up...", as_user=True)
+        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta starting up... ("+strftime("%z", gmtime())+")", as_user=True)
         while True:
             schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
