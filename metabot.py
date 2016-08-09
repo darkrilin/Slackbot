@@ -242,7 +242,7 @@ if __name__ == "__main__":
         "I'm a robot, not a comedian. Please stop asking me to tell jokes."
     ]
 
-    schedule.every().day.at('19:30').do(check_studio_update)
+    schedule.every().day.at('8:30').do(check_studio_update)
 
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
