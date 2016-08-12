@@ -5,11 +5,13 @@ from ast import literal_eval
 from time import sleep, strftime, gmtime
 from random import choice
 from slackclient import SlackClient
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 # SLACK FUNCTIONS
 def handle_command(command, channel, caller):
+    global timer_start, timer_stop, timer_name
+    
     if command.startswith(':'):
         command = command[1::]
     response = choice(CONFUSED)
@@ -50,12 +52,21 @@ def handle_command(command, channel, caller):
         else:
             response = "You aren't allowed to do that."
     elif command.startswith('help'):
-        command = command.replace('help ', '').replace(' ', '')
+        command = command.replace('help', '').replace(' ', '')
         response = get_help(is_admin(name_from_id(caller)[1]), command)
     elif command.startswith('timer'):
-        command = command.replace('timer ', '').split(',')
+        command = [i for i in command.replace('timer ', '').split(',') if i!='']
         print(command)
-        response = begin_timer()
+        if len(command)==0 or command[0]=='timer':
+            response = timer_remaining(timer_start, timer_stop, timer_name)
+        elif name_from_id(caller)[1] in get_admins(True):
+            try:
+                timer_start,timer_stop,response = timer_begin(datetime.strptime(command[0],'%Y-%m-%d %H:%M:%S'),datetime.strptime(command[1],'%Y-%m-%d %H:%M:%S'),command[2].title())
+                timer_name = command[2].title()
+            except:
+                response = "Something went wrong, perhaps you need to format the time correctly (YYYY-MM-DD HH:MM:SS)"
+        else:
+            response = "You aren't allowed to do that."
     elif command.startswith('ping'):
         response = 'Pong!'
     elif 'joke' in command:
@@ -105,10 +116,10 @@ def get_help(admin=False, subcommand=""):
     if admin:
         if subcommand == "":
             return "```Commands:\
-\nhelp  -  shows a list of commands (duh!) \
-\nping  -  pings the bot host\
-\ntest* -  testing bot functions\nget*  -  get slack status values \
-\n\n* type 'help command' to view full command```"
+\nget*   -  get slack status values\nhelp   -  shows a list of commands (duh!)\
+\nping   -  pings the bot host\ntest*  -  testing bot functions\
+\ntimer* -  set a timer for jams and things\
+\n\n* type 'help [command]' to view full command```"
         else:
             if subcommand == "get":
                 return "```Fetches data from the slack client\nUsage: get [admins|users|name|channel|id] (value)```"
@@ -120,7 +131,7 @@ def get_help(admin=False, subcommand=""):
         if subcommand == "":
             return "```Commands:\
 \nhelp  -  shows a list of commands (duh!) \
-\nping  -  pings the bot host```"
+\nping  -  pings the bot host\ntimer -  shows time left on current timers```"
         else:
             return "Can't find command: " + subcommand
             
@@ -196,11 +207,43 @@ def id_from_name(username):
             return True,i['id']
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
 
-def begin_timer(start=get_time(), stop=get_time()):
-    print(start)
-    print(stop)
-    print(stop-start)
-    return 'whoa'
+def timer_begin(start=get_time(), stop=get_time()+timedelta(days=1), name='Standard Timer'):
+    schedule.every().day.at('23:47').do(timer_daysleft, stop, name)
+    return start,stop,"Timer initialised *"+name+"*\nStarts: "+str(start)+"\nFinishes: "+str(stop)
+
+def timer_remaining(start,stop,name):
+    if start != None and stop != None:
+        timeuntil = start-get_time()
+        if timeuntil.days >= 0:
+            return "Time until *" + name + "* begins: "+str(timeuntil)
+        else:
+            timeleft = stop-get_time()
+            if timeleft.days < 0:
+                return "No active timers found"
+            else:
+                return "*" + name + "* time remaining: "+str(timeleft)
+    else:
+        return "No active timers found"
+
+def timer_daysleft(stop,name):
+    global timer_start
+    if (get_time()-timer_start).days >= 0:
+        if (stop-get_time()).days >= 1:
+            slack_client.api_call("chat.postMessage", channel='D1WC4VBBJ', text=str((stop-get_time()).days)+" days until end of *"+name+"*", as_user=True)
+        if (stop-get_time()).days == 1:
+            schedule.every().hour().do(timer_hoursleft, stop, name)
+            return schedule.CancelJob
+
+def timer_hoursleft(stop,name):
+    global timer_start, timer_stop, timer_name
+    if (stop-get_time()).hours <= 0:
+        slack_client.api_call('chat.postMessage', channel='D1WC4VBBJ', text="*"+name.upper()+"* HAS ENDED! HOORAY!", as_user=True)
+        timer_start = None
+        timer_stop = None
+        timer_name = None
+        return schedule.CancelJob
+    else:
+        slack_client.api_call('chat.postMessage', channel='D1WC4VBBJ', text=str((stop-get_time()).hours)+" hours until end of *"+name+"*", as_user=True)
 
 def check_studio_update(getval=False):
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
@@ -240,6 +283,10 @@ if __name__ == "__main__":
 
     slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
     debug_token = os.environ['SLACK_TEST_TOKEN']
+
+    timer_start = None
+    timer_stop = None
+    timer_name = None
 
     CONFUSED = [
         "I'm not really sure what you mean", "I'm not sure what you're saying", "I don't understand",
