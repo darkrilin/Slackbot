@@ -229,23 +229,23 @@ def timer_daysleft(stop,name):
     global timer_start
     if (get_time()-timer_start).days >= 0:
         if (stop-get_time()).days >= 1:
-            slack_client.api_call("chat.postMessage", channel='D1WC4VBBJ', text=str((stop-get_time()).days)+" days until end of *"+name+"*", as_user=True)
+            slack_client.api_call("chat.postMessage", channel='G1WARM8QM', text=str((stop-get_time()).days)+" days until end of *"+name+"*", as_user=True)
         if (stop-get_time()).days == 1:
             schedule.every().hour().do(timer_hoursleft, stop, name)
             return schedule.CancelJob
     elif (get_time()-timer_start).days == -1:
-        slack_client.api_call('chat.postMessage', channel="", text=timer_remaining(timer_start, stop, none), as_user=True)
+        slack_client.api_call('chat.postMessage', channel="G1WARM8QM", text=timer_remaining(timer_start, stop, none), as_user=True)
 
 def timer_hoursleft(stop,name):
     global timer_start, timer_stop, timer_name
     if (stop-get_time()).hours <= 0:
-        slack_client.api_call('chat.postMessage', channel='D1WC4VBBJ', text="*"+name.upper()+"* HAS ENDED! HOORAY!", as_user=True)
+        slack_client.api_call('chat.postMessage', channel='G1WARM8QM', text="*"+name.upper()+"* HAS ENDED! HOORAY!", as_user=True)
         timer_start = None
         timer_stop = None
         timer_name = None
         return schedule.CancelJob
     else:
-        slack_client.api_call('chat.postMessage', channel='D1WC4VBBJ', text=str((stop-get_time()).hours)+" hours until end of *"+name+"*", as_user=True)
+        slack_client.api_call('chat.postMessage', channel='G1WARM8QM', text=str((stop-get_time()).hours)+" hours until end of *"+name+"*", as_user=True)
 
 def check_studio_update(getval=False):
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
