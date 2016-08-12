@@ -43,13 +43,19 @@ def handle_command(command, channel, caller):
             elif 'id' in command:
                 command = command.split(' ')[-1]
                 response = id_from_name(command)[1]
+            elif 'time' in command:
+                response = get_time()
             else:
                 response = get_help(True, 'get')
         else:
             response = "You aren't allowed to do that."
     elif command.startswith('help'):
-        command = command.replace('help', '').replace(' ', '')
+        command = command.replace('help ', '').replace(' ', '')
         response = get_help(is_admin(name_from_id(caller)[1]), command)
+    elif command.startswith('timer'):
+        command = command.replace('timer ', '').split(',')
+        print(command)
+        response = begin_timer()
     elif command.startswith('ping'):
         response = 'Pong!'
     elif 'joke' in command:
@@ -100,7 +106,7 @@ def get_help(admin=False, subcommand=""):
         if subcommand == "":
             return "```Commands:\
 \nhelp  -  shows a list of commands (duh!) \
-\nping  -  pings the bot host\njoke  -  tells a joke \
+\nping  -  pings the bot host\
 \ntest* -  testing bot functions\nget*  -  get slack status values \
 \n\n* type 'help command' to view full command```"
         else:
@@ -114,7 +120,7 @@ def get_help(admin=False, subcommand=""):
         if subcommand == "":
             return "```Commands:\
 \nhelp  -  shows a list of commands (duh!) \
-\nping  -  pings the bot host\njoke  -  tells a joke```"
+\nping  -  pings the bot host```"
         else:
             return "Can't find command: " + subcommand
             
@@ -161,6 +167,9 @@ def get_admins(justnames=False):
                 namelist += [i['name']]
     return namelist
 
+def get_time():
+    return datetime.now().replace(microsecond=0)
+
 def is_admin(name):
     if name in get_users(True):
         if name in get_admins(True):
@@ -186,6 +195,12 @@ def id_from_name(username):
         if i['name'] == username:
             return True,i['id']
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
+
+def begin_timer(start=get_time(), stop=get_time()):
+    print(start)
+    print(stop)
+    print(stop-start)
+    return 'whoa'
 
 def check_studio_update(getval=False):
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
