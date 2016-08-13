@@ -211,7 +211,7 @@ def timer_begin(start=get_time(), stop=get_time()+timedelta(days=1), name='Stand
     schedule.every().day.at('23:59').do(timer_daysleft, stop, name)
     return start,stop,"Timer initialised *"+name+"*\nStarts: "+str(start)+"\nFinishes: "+str(stop)
 
-def timer_remaining(start,stop,name):
+def timer_remaining(start, stop, name):
     if start != None and stop != None:
         timeuntil = start-get_time()
         if timeuntil.days >= 0:
@@ -225,7 +225,7 @@ def timer_remaining(start,stop,name):
     else:
         return "No active timers found"
 
-def timer_daysleft(stop,name):
+def timer_daysleft(stop, name):
     global timer_start
     if (get_time()-timer_start).days >= 0:
         if (stop-get_time()).days >= 1:
@@ -234,9 +234,9 @@ def timer_daysleft(stop,name):
             schedule.every().hour().do(timer_hoursleft, stop, name)
             return schedule.CancelJob
     elif (get_time()-timer_start).days == -1:
-        slack_client.api_call('chat.postMessage', channel="C07F9TDHV", text=timer_remaining(timer_start, stop, none), as_user=True)
+        slack_client.api_call('chat.postMessage', channel="C07F9TDHV", text=timer_remaining(timer_start, stop, name), as_user=True)
 
-def timer_hoursleft(stop,name):
+def timer_hoursleft(stop, name):
     global timer_start, timer_stop, timer_name
     if (stop-get_time()).hours <= 0:
         slack_client.api_call('chat.postMessage', channel='C07F9TDHV', text="*"+name.upper()+"* HAS ENDED! HOORAY!", as_user=True)
