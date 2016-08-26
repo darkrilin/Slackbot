@@ -306,14 +306,14 @@ if __name__ == "__main__":
         "I'm a robot, not a comedian. Please stop asking me to tell jokes."
     ]
 
-    schedule.every().day.at('8:30').do(check_studio_update)
+    #schedule.every().day.at('8:30').do(check_studio_update)
 
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta starting up... ("+strftime("%z", gmtime())+")", as_user=True)
         while True:
-            schedule.run_pending()
+            #schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
                 handle_command(command, channel, caller)
