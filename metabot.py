@@ -266,7 +266,7 @@ def check_studio_update(getval=False):
                     elif name == 'gmstudioea':
                         response = "GameMaker:Studio Early Access updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
                 else:
-                    response += str(name) + " last updated " + str(daysago) + " days ago\n"
+                    response += str(name) + " last updated to v" + source[name]['version'] + ", " + str(daysago) + " days ago\n"
     if getval:
         return isupdate,response
     else:
