@@ -1,5 +1,5 @@
 import os
-import schedule
+#import schedule
 from urllib import request
 from ast import literal_eval
 from time import sleep, strftime, gmtime
@@ -54,7 +54,13 @@ def handle_command(command, channel, caller):
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
         response = get_help(is_admin(name_from_id(caller)[1]), command)
-    elif command.startswith('timer'):
+    elif command.startswith("rules"):
+        response = get_rules()
+    elif command.startswith('ping'):
+        response = 'Pong!'
+    elif 'joke' in command:
+        response = choice(JOKES)
+    """elif command.startswith('timer'):
         command = [i for i in command.replace('timer ', '').split(',') if i!='']
         print(command)
         if len(command)==0 or command[0]=='timer':
@@ -66,12 +72,7 @@ def handle_command(command, channel, caller):
             except:
                 response = "Something went wrong, perhaps you need to format the time correctly (YYYY-MM-DD HH:MM:SS)"
         else:
-            response = "You aren't allowed to do that."
-    elif command.startswith('ping'):
-        response = 'Pong!'
-    elif 'joke' in command:
-        response = choice(JOKES)
-
+            response = "You aren't allowed to do that."""
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 def parse_slack_output(slack_rtm_output):
@@ -84,13 +85,10 @@ def parse_slack_output(slack_rtm_output):
                         welcome(output['user'], output['channel'])
                         return None, None, None
                 if 'user' in output:
-                    print()
-                    print(output)
                     if AT_BOT in output['text']:
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                     elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                         return output['text'].strip().lower(), output['channel'], output['user']
-
     return None, None, None
 
 
@@ -101,11 +99,11 @@ def welcome(userid, channel):
     userid = userid.upper()
     slack_client.api_call('chat.postMessage', channel=channel, text=choice(GREETINGS).replace('X',name_from_id(userid)[1]), as_user=True)
     slack_client.api_call('chat.postMessage', channel=userid,
-                          text="Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here: \n\
-\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise. \
+                          text="Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here:\n\
+\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise.\
 \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, \
-and if they wander off somewhere interesting then it's not a big deal. \
-\n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' and ' + get_admins(True)[-1] + '. \
+and if they wander off somewhere interesting then it's not a big deal.\
+\n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are @" + ', @'.join(get_admins(True)[:-1]) + ' &amp; @' + get_admins(True)[-1] + '.\
 \n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off', as_user=True)
     return ''
 
@@ -118,7 +116,7 @@ def get_help(admin=False, subcommand=""):
             return "```Commands:\
 \nget*   -  get slack status values\nhelp   -  shows a list of commands (duh!)\
 \nping   -  pings the bot host\ntest*  -  testing bot functions\
-\ntimer* -  set a timer for jams and things\
+\nrules  -  shows a list of the rules\
 \n\n* type 'help [command]' to view full command```"
         else:
             if subcommand == "get":
@@ -130,11 +128,19 @@ def get_help(admin=False, subcommand=""):
     else:
         if subcommand == "":
             return "```Commands:\
-\nhelp  -  shows a list of commands (duh!) \
-\nping  -  pings the bot host\ntimer -  shows time left on current timers```"
+\nhelp  -  shows a list of commands (duh!)\
+\nping  -  pings the bot host\
+\nrules -  shows a list of the rules```"
         else:
             return "Can't find command: " + subcommand
-            
+
+def get_rules():
+    return "We've got two rules here:\n\
+\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise.\
+\n2) Try to keep the chat vaguely on-topic. At least start discussions that are on-topic, \
+and if they wander off somewhere interesting then it's not a big deal.\
+\n\nFinally, if you have any questions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' &amp; ' + get_admins(True)[-1] + '.'
+
 def get_channels(justnames=False, channel=""):
     userlist = slack_client.api_call('channels.list', token=debug_token)
     if channel == "":
@@ -207,46 +213,6 @@ def id_from_name(username):
             return True,i['id']
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
 
-def timer_begin(start=get_time(), stop=get_time()+timedelta(days=1), name='Standard Timer'):
-    schedule.every().day.at('23:59').do(timer_daysleft, stop, name)
-    return start,stop,"Timer initialised *"+name+"*\nStarts: "+str(start)+"\nFinishes: "+str(stop)
-
-def timer_remaining(start, stop, name):
-    if start != None and stop != None:
-        timeuntil = start-get_time()
-        if timeuntil.days >= 0:
-            return "Time until *" + name + "* begins: "+str(timeuntil)
-        else:
-            timeleft = stop-get_time()
-            if timeleft.days < 0:
-                return "No active timers found"
-            else:
-                return "*" + name + "* time remaining: "+str(timeleft)
-    else:
-        return "No active timers found"
-
-def timer_daysleft(stop, name):
-    global timer_start
-    if (get_time()-timer_start).days >= 0:
-        if (stop-get_time()).days >= 1:
-            slack_client.api_call("chat.postMessage", channel='C07F9TDHV', text=str((stop-get_time()).days)+" days until end of *"+name+"*", as_user=True)
-        if (stop-get_time()).days == 1:
-            schedule.every().hour().do(timer_hoursleft, stop, name)
-            return schedule.CancelJob
-    elif (get_time()-timer_start).days == -1:
-        slack_client.api_call('chat.postMessage', channel="C07F9TDHV", text=timer_remaining(timer_start, stop, name), as_user=True)
-
-def timer_hoursleft(stop, name):
-    global timer_start, timer_stop, timer_name
-    if (stop-get_time()).hours <= 0:
-        slack_client.api_call('chat.postMessage', channel='C07F9TDHV', text="*"+name.upper()+"* HAS ENDED! HOORAY!", as_user=True)
-        timer_start = None
-        timer_stop = None
-        timer_name = None
-        return schedule.CancelJob
-    else:
-        slack_client.api_call('chat.postMessage', channel='C07F9TDHV', text=str((stop-get_time()).hours)+" hours until end of *"+name+"*", as_user=True)
-
 def check_studio_update(getval=False):
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
     isupdate = False
@@ -255,7 +221,7 @@ def check_studio_update(getval=False):
         source = literal_eval(str(request.urlopen(i).read())[2:-1])
         if isupdate == False:
             for i in source:
-                name = i
+                name = str(i)
                 daysago = source[name]['daysAgo']
                 if daysago == '0':
                     isupdate = True
@@ -266,7 +232,9 @@ def check_studio_update(getval=False):
                     elif name == 'gmstudioea':
                         response = "GameMaker:Studio Early Access updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
                 else:
-                    response += str(name) + " last updated " + str(daysago) + " days ago\n"
+                    print(name)
+                    name = name.replace('gmstudiobeta','GameMaker:Studio *Beta*').replace('gmstudioea','GameMaker:Studio *_Early Access_*').replace('gmstudio','GameMaker:Studio')
+                    response += name + " last updated " + str(daysago) + " days ago\n"
     if getval:
         return isupdate,response
     else:
@@ -311,7 +279,7 @@ if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = .5
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
-        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta starting up... ("+strftime("%z", gmtime())+")", as_user=True)
+        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta connected and running!", as_user=True)
         while True:
             #schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
