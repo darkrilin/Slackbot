@@ -80,7 +80,7 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
             if 'text' in output:
                 if 'subtype' in output and 'channel' in output:
-                    if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == get_channels(True, 'general')[1]:
+                    if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == get_channels(True, 'lounge')[1]:
                         welcome(output['user'], output['channel'])
                         return None, None, None
                 if 'user' in output:
@@ -271,7 +271,7 @@ def check_studio_update(getval=False):
         return isupdate,response
     else:
         if isupdate:
-            slack_client.api_call("chat.postMessage", channel='general', text=response, as_user=True)
+            slack_client.api_call("chat.postMessage", channel=get_channels(True, 'lounge')[1], text=response, as_user=True)
         return ""
 
 
