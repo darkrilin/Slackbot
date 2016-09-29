@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
     #schedule.every().day.at('8:30').do(check_studio_update)
 
-    READ_WEBSOCKET_DELAY = .5
+    READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta connected and running!", as_user=True)
