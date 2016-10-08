@@ -58,8 +58,6 @@ def handle_command(command, channel, caller):
         response = get_rules()
     elif command.startswith('ping'):
         response = 'Pong!'
-    elif 'joke' in command:
-        response = choice(JOKES)
     """elif command.startswith('timer'):
         command = [i for i in command.replace('timer ', '').split(',') if i!='']
         print(command)
@@ -257,19 +255,15 @@ if __name__ == "__main__":
     timer_name = None
 
     CONFUSED = [
-        "I'm not really sure what you mean", "I'm not sure what you're saying", "I don't understand",
-        "What do you mean?", "I'm not sure I understand", "What are you saying?", "Huh?", "¯\_(ツ)_/¯",
+        "I am not really sure what you mean", "I am not sure what you're saying", "I do not get it",
+		"I do not understand", "Are you sure?", "Please explain", "My robot brain can not perform that function"
+        "What do you mean?", "I am not sure I understand", "What are you saying?", "Huh?", "¯\_(ツ)_/¯",
         "What are you trying to say?", "What does that mean?", "Could you explain?", "What?"
     ]
     GREETINGS = [
         "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
-        "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!",
+        "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!", "Hello X!"
         "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
-    ]
-    JOKES = [
-        "Hey, kid. I don't do humour any more...", "What, do you think I'm a clown?", "I don't tell jokes",
-        "I'm all outta jokes.", "I'm sorry, but there will be no more jokes. Robots can't do humour.",
-        "I'm a robot, not a comedian. Please stop asking me to tell jokes."
     ]
 
     #schedule.every().day.at('8:30').do(check_studio_update)

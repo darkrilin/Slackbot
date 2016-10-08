@@ -1,1 +1,1 @@
-bot: python metabot.py
+worker: python metabot.py
