@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
     CONFUSED = [
         "I am not really sure what you mean", "I am not sure what you're saying", "I do not get it",
-		"I do not understand", "Are you sure?", "Please explain", "My robot brain can not perform that function"
+		"I do not understand", "Are you sure?", "Please explain", "My robot brain can not perform that function",
         "What do you mean?", "I am not sure I understand", "What are you saying?", "Huh?", "¯\_(ツ)_/¯",
         "What are you trying to say?", "What does that mean?", "Could you explain?", "What?"
     ]
