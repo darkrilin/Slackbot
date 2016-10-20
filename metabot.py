@@ -1,20 +1,19 @@
 import os
-#import schedule
+import json
 from urllib import request
 from ast import literal_eval
-from time import sleep, strftime, gmtime
+from time import sleep
 from random import choice
 from slackclient import SlackClient
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 # SLACK FUNCTIONS
 def handle_command(command, channel, caller):
-    global timer_start, timer_stop, timer_name
-    
     if command.startswith(':'):
         command = command[1::]
-    response = choice(CONFUSED)
+        
+    response = choice(DEFAULT_RESPONSES['confused'])
     if command.startswith('test'):
         if name_from_id(caller)[1] in get_admins(True):
             command = command.replace('test ', '')
@@ -26,7 +25,8 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'test')
         else:
-            response = "You aren't allowed to do that."
+            response = choice(DEFAULT_RESPONSES['badresponse'])
+            
     elif command.startswith('get'):
         if name_from_id(caller)[1] in get_admins(True):
             if 'admin' in command:
@@ -50,28 +50,20 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'get')
         else:
-            response = "You aren't allowed to do that."
+            response = choice(DEFAULT_RESPONSES['badresponse'])
+            
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
         response = get_help(is_admin(name_from_id(caller)[1]), command)
+        
     elif command.startswith("rules"):
         response = get_rules()
+        
     elif command.startswith('ping'):
         response = 'Pong!'
-    """elif command.startswith('timer'):
-        command = [i for i in command.replace('timer ', '').split(',') if i!='']
-        print(command)
-        if len(command)==0 or command[0]=='timer':
-            response = timer_remaining(timer_start, timer_stop, timer_name)
-        elif name_from_id(caller)[1] in get_admins(True):
-            try:
-                timer_start,timer_stop,response = timer_begin(datetime.strptime(command[0],'%Y-%m-%d %H:%M:%S'),datetime.strptime(command[1],'%Y-%m-%d %H:%M:%S'),command[2].title())
-                timer_name = command[2].title()
-            except:
-                response = "Something went wrong, perhaps you need to format the time correctly (YYYY-MM-DD HH:MM:SS)"
-        else:
-            response = "You aren't allowed to do that."""
+        
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+
 
 def parse_slack_output(slack_rtm_output):
     output_list = slack_rtm_output
@@ -90,23 +82,18 @@ def parse_slack_output(slack_rtm_output):
     return None, None, None
 
 
-
-
 # COMMANDS
 def welcome(userid, channel):
     userid = userid.upper()
-    slack_client.api_call('chat.postMessage', channel=channel, text=choice(GREETINGS).replace('X',name_from_id(userid)[1]), as_user=True)
+    slack_client.api_call('chat.postMessage', channel=channel, text=choice(DEFAULT_RESPONSES['greetings']).replace('X',name_from_id(userid)[1]), as_user=True)
     slack_client.api_call('chat.postMessage', channel=userid,
-                          text="Hi " + name_from_id(userid)[1] + "! \n\nWe've got two rules here:\n\
-\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise.\
-\n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, \
-and if they wander off somewhere interesting then it's not a big deal.\
-\n\nIf you have any suggestions or wanna hurl abuse at the admins, your targets are @" + ', @'.join(get_admins(True)[:-1]) + ' &amp; @' + get_admins(True)[-1] + '.\
-\n\nWe suggest that you join some of our channels for extra fun and games: #bitching #game_jams #off-topic #rookie #show-off', as_user=True)
+                          text=DEFAULT_RESPONSES['intro'].replace('<NAME>', name_from_id(userid)[1]).replace('<ADMINS>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1]), as_user=True)
     return ''
+
 
 def ping():
     slack_client.api_call("chat.postMessage", channel='G1WARM8QM', text="Ping!", as_user=True)
+
 
 def get_help(admin=False, subcommand=""):
     if admin:
@@ -132,12 +119,10 @@ def get_help(admin=False, subcommand=""):
         else:
             return "Can't find command: " + subcommand
 
+
 def get_rules():
-    return "We've got two rules here:\n\
-\n1) Don't be a dick. Respect the admins if they nudge you - They'll be nice, I promise.\
-\n2) Try to keep the chat vaguely on-topic. At least start discussions that are on-topic, \
-and if they wander off somewhere interesting then it's not a big deal.\
-\n\nFinally, if you have any questions or wanna hurl abuse at the admins, your targets are " + ', '.join(get_admins(True)[:-1]) + ' &amp; ' + get_admins(True)[-1] + '.'
+    return DEFAULT_RESPONSES['rules'].replace('<ADMINS>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1])
+
 
 def get_channels(justnames=False, channel=""):
     userlist = slack_client.api_call('channels.list', token=debug_token)
@@ -156,6 +141,7 @@ def get_channels(justnames=False, channel=""):
                 return i[0], i[1]
         return False
 
+
 def get_users(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
     if justnames == True:
@@ -166,12 +152,14 @@ def get_users(justnames=False):
     else:
         return userlist
 
+
 def get_user_ids():
     userlist = slack_client.api_call('users.list', token=debug_token)
     idlist = []
     for i in userlist['members']:
         idlist += [i['id']]
     return idlist
+
 
 def get_admins(justnames=False):
     userlist = slack_client.api_call('users.list', token=debug_token)
@@ -182,8 +170,10 @@ def get_admins(justnames=False):
                 namelist += [i['name']]
     return namelist
 
+
 def get_time():
     return datetime.now().replace(microsecond=0)
+
 
 def is_admin(name):
     if name in get_users(True):
@@ -197,6 +187,7 @@ def is_admin(name):
     else:
         return False,'*"WHO IS THIS ' + name.upper() + ' YOU SPEAK OF"*'
 
+
 def name_from_id(userid):
     userlist = get_users()
     for i in userlist['members']:
@@ -204,12 +195,14 @@ def name_from_id(userid):
             return True,i['name']
     return False,"Incorrect ID"
 
+
 def id_from_name(username):
     userlist = get_users()
     for i in userlist['members']:
         if i['name'] == username:
             return True,i['id']
     return False,'*"WHO IS THIS ' + username.upper() + ' YOU SPEAK OF"*'
+
 
 def check_studio_update(getval=False):
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
@@ -239,9 +232,6 @@ def check_studio_update(getval=False):
         return ""
 
 
-
-
-
 # MAIN
 if __name__ == "__main__":
     BOT_ID = os.environ['SLACK_BOT_ID']
@@ -250,30 +240,15 @@ if __name__ == "__main__":
     slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
     debug_token = os.environ['SLACK_TEST_TOKEN']
 
-    timer_start = None
-    timer_stop = None
-    timer_name = None
-
-    CONFUSED = [
-        "I am not really sure what you mean", "I am not sure what you're saying", "I do not get it",
-		"I do not understand", "Are you sure?", "Please explain", "My robot brain can not perform that function",
-        "What do you mean?", "I am not sure I understand", "What are you saying?", "Huh?", "¯\_(ツ)_/¯",
-        "What are you trying to say?", "What does that mean?", "Could you explain?", "What?"
-    ]
-    GREETINGS = [
-        "Hi X! Welcome to the gamemaker slack!", "Hello X, welcome to the wonderful world of the gamemaker slack!",
-        "Oh, hello X!", "Ladies and Gentlemen, it is my great pleasure today to introduce X!", "Hello X!"
-        "Welcome to the gamemaker slack, X.", "Welcome, X!", "Ooh we have a new person.\nHello X!"
-    ]
-
-    #schedule.every().day.at('8:30').do(check_studio_update)
+    with open('data/defaultresponses.json') as data_file:
+        DEFAULT_RESPONSES = json.load(data_file)
 
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta connected and running!", as_user=True)
+        check_studio_update()
         while True:
-            #schedule.run_pending()
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
                 handle_command(command, channel, caller)

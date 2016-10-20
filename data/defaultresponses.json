@@ -1,0 +1,42 @@
+{
+	"intro":
+		"Hi <NAME>! \nWe have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nIf you have any suggestions or wanna hurl abuse at our hotpockets, your targets are <ADMINS>. \n\nWe suggest that you join some of our other channels:\n<#C25F64CRF|the_big_topic> contains interesting conversation related to game development and industry\n<#C0KNZQ7K6|bitching> is great if you want to blow off some steam."
+	,
+	"rules":
+		"We have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nFinally, if you have any questions, feel free to hurl abuse at our hotpockets. Your targets are <ADMINS>."
+	,
+	"greetings": [
+		"Hi X! Welcome to the gamemaker slack!",
+		"Hello X, welcome to the wonderful world of the gamemaker slack!",
+		"Ladies and Gentlemen, it is my pleasure today to introduce X!",
+        "Welcome to the gamemaker slack, X.",
+		"Ooh we have a new person.\nHello X!",
+		"Welcome, X!",
+		"Oh, hello X!",
+		"Hello X!"
+	],
+	"confused": [
+		"I am not really sure what you mean",
+		"I am not sure what you are saying",
+		"I do not get it",
+		"I do not understand",
+		"Are you sure?",
+		"Please explain",
+		"Are you certain?",
+		"My robot brain cannot perform that function",
+		"My robot brain does not accept your input",
+		"What do you mean?",
+		"I am not sure I understand",
+		"What are you saying?",
+		"Huh?",
+		"What are you trying to say?",
+		"What does that mean?",
+		"Could you explain?",
+		"What?"
+	],
+	"badresponse": [
+        "You are not allowed to do that.",
+		"You are not permitted to perform that action.",
+		"Access Denied."
+    ]
+}
