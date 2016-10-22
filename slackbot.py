@@ -246,7 +246,7 @@ if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
-        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Meta connected and running!", as_user=True)
+        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting...", as_user=True)
         check_studio_update()
         while True:
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
