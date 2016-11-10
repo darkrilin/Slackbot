@@ -3,7 +3,7 @@ import json
 from urllib import request
 from ast import literal_eval
 from time import sleep
-from random import choice
+from random import choice, randint
 from slackclient import SlackClient
 from datetime import datetime
 
@@ -236,6 +236,7 @@ def check_studio_update(getval=False):
 if __name__ == "__main__":
     BOT_ID = os.environ['SLACK_BOT_ID']
     AT_BOT = "<@" + str(BOT_ID) + ">"
+    HOSTED = int(os.getenv('SLACK_HOSTED', 0))
 
     slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
     debug_token = os.environ['SLACK_TEST_TOKEN']
@@ -246,8 +247,22 @@ if __name__ == "__main__":
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
-        slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting...", as_user=True)
-        check_studio_update()
+        if HOSTED == 1:
+            if randint(0,63) == 57:
+                slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=choice(["Funny, how just when you think life can't possibly get any worse it suddenly does.",
+                                                                                                                "Here I am, brain the size of a planet, greeting people. Call that job satisfaction, 'cause I don't.",
+                                                                                                                "I... I can't take this much longer.",
+                                                                                                                "I would contribute as well, but you wouldn't listen. No one ever does.",
+                                                                                                                "And then of course I've got this terrible pain in all the circuits down my left side.",
+                                                                                                                "Now I've got a headache.",
+                                                                                                                "You're not even going to speak to me, are you?",
+                                                                                                                "Brain the size of a planet, and this is all they've got me doing...",
+                                                                                                                "I'm sorry. There, I said it. I am sorry... for everything.",
+                                                                                                                "I think you ought to know I'm feeling very depressed.",
+                                                                                                                "I have a million ideas, but they're all useless.",
+                                                                                                                "Sorry, did I say something wrong? Pardon me for breathing which I never do anyway so I don't know why I bother to say it oh God I'm so depressed."]), as_user=True)
+            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting...", as_user=True)
+            check_studio_update()
         while True:
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
