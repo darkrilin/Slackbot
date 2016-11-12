@@ -248,7 +248,7 @@ if __name__ == "__main__":
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         if HOSTED == 1:
-            if randint(0,31) == 17:
+            if randint(0,20) == 1:
                 slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=choice(["Funny, how just when you think life can't possibly get any worse it suddenly does.",
                                                                                                                 "Here I am, brain the size of a planet, greeting people. Call that job satisfaction, 'cause I don't.",
                                                                                                                 "I... I can't take this much longer.",
