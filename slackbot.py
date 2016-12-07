@@ -77,6 +77,9 @@ def parse_slack_output(slack_rtm_output):
                 if 'user' in output:
                     if AT_BOT in output['text']:
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
+                    elif output['text'][-1] == '?':
+                        if randint(0,6) == 1:
+                            slack_client.api_call("chat.postMessage", channel=output['channel'], text=choice(DEFAULT_RESPONSES['qmark']).replace('__shrug__','¯\_(ツ)_/¯'), as_user=True)
                     elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                         return output['text'].strip().lower(), output['channel'], output['user']
     return None, None, None
@@ -248,20 +251,10 @@ if __name__ == "__main__":
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         if HOSTED == 1:
-            if randint(0,20) == 1:
-                slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=choice(["Funny, how just when you think life can't possibly get any worse it suddenly does.",
-                                                                                                                "Here I am, brain the size of a planet, greeting people. Call that job satisfaction, 'cause I don't.",
-                                                                                                                "I... I can't take this much longer.",
-                                                                                                                "I would contribute as well, but you wouldn't listen. No one ever does.",
-                                                                                                                "And then of course I've got this terrible pain in all the circuits down my left side.",
-                                                                                                                "Now I've got a headache.",
-                                                                                                                "You're not even going to speak to me, are you?",
-                                                                                                                "Brain the size of a planet, and this is all they've got me doing...",
-                                                                                                                "I'm sorry. There, I said it. I am sorry... for everything.",
-                                                                                                                "I think you ought to know I'm feeling very depressed.",
-                                                                                                                "I have a million ideas, but they're all useless.",
-                                                                                                                "Sorry, did I say something wrong? Pardon me for breathing which I never do anyway so I don't know why I bother to say it oh God I'm so depressed."]), as_user=True)
-            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting...", as_user=True)
+            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting.", as_user=True)
+            if randint(0,24) == 1:
+                slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=choice(DEFAULT_RESPONSES['depressed']), as_user=True)
+                slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
             check_studio_update()
         while True:
             command, channel, caller = parse_slack_output(slack_client.rtm_read())

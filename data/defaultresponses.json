@@ -38,5 +38,34 @@
         "You are not allowed to do that.",
 		"You are not permitted to perform that action.",
 		"Access Denied."
-    ]
+    ],
+	"depressed": [
+		"Funny, how just when you think life can't possibly get any worse it suddenly does.",
+        "Here I am, brain the size of a planet, greeting people. Call that job satisfaction, 'cause I don't.",
+        "I... I can't take this much longer.",
+        "I would contribute as well, but you wouldn't listen. No one ever does.",
+        "And then of course I've got this terrible pain in all the circuits down my left side.",
+        "Now I've got a headache.",
+        "You're not even going to speak to me, are you?",
+        "Brain the size of a planet, and this is all they've got me doing...",
+        "I'm sorry. There, I said it. I am sorry... for everything.",
+        "I have a million ideas, but they're all useless.",
+        "Sorry, did I say something wrong? Pardon me for breathing which I never do anyway so I don't know why I bother to say it oh God I'm so depressed."
+	],
+	"qmark": [
+		"__shrug__",
+		"Not sure how to answer that one, sorry",
+		"Have you tried turning it on and off again? ",
+		"Not sure about that",
+		"Care to elaborate?",
+		"No",
+		"Yes",
+		"Probably",
+		"Maybe",
+		"I don't know",
+		"I'd go with the latter option",
+		"Try asking in <#C0SMJRAA0|help>",
+		"Your question might be better answered in <#C0SMJRAA0|help>",
+		"Have you met our lord and saviour <#C0SMJRAA0|help>?"
+	]
 }
