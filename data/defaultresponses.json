@@ -23,8 +23,8 @@
 		"Are you sure?",
 		"Please explain",
 		"Are you certain?",
-		"My robot brain cannot perform that function",
-		"My robot brain does not accept your input",
+		"Error: function not found",
+		"Incorrect input",
 		"What do you mean?",
 		"I am not sure I understand",
 		"What are you saying?",
@@ -32,7 +32,8 @@
 		"What are you trying to say?",
 		"What does that mean?",
 		"Could you explain?",
-		"What?"
+		"What?",
+		"Error: I do not understand"
 	],
 	"badresponse": [
         "You are not allowed to do that.",
