@@ -79,10 +79,10 @@ def parse_slack_output(slack_rtm_output):
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                     elif output['text'][-1] == '?':
                         if randint(0,20) == 1:
-							sleep(1)
+                            sleep(1)
                             slack_client.api_call("chat.postMessage", channel=output['channel'], text=choice(DEFAULT_RESPONSES['qmark']).replace('__shrug__','¯\_(ツ)_/¯'), as_user=True)
-                    elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
-                        return output['text'].strip().lower(), output['channel'], output['user']
+                elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
+                    return output['text'].strip().lower(), output['channel'], output['user']
     return None, None, None
 
 
@@ -248,17 +248,20 @@ if __name__ == "__main__":
     with open('data/defaultresponses.json') as data_file:
         DEFAULT_RESPONSES = json.load(data_file)
 
+    with open('data/selfintro.json') as data_file:
+        SELF_INTRODUCTION = json.load(data_file)
+
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
         if HOSTED == 1:
             slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting.", as_user=True)
             if randint(0,24) == 1:
-				depressed_text = choice(DEFAULT_RESPONSES['depressed'])
-				if "Hehehe" in depressed_text:
-					slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=choice(DEFAULT_RESPONSES['test_attachments']), as_user=True)
-				else:
-					slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
+                depressed_text = choice(DEFAULT_RESPONSES['depressed'])
+                if "Hehehe" in depressed_text:
+                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRODUCTION, as_user=True)
+                else:
+                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
                 slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
             check_studio_update()
         while True:
