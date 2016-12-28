@@ -74,15 +74,19 @@ def parse_slack_output(slack_rtm_output):
                     if (output['type'] == 'channel_join' or output['subtype'] == 'channel_join') and output['channel'] == get_channels(True, 'lounge')[1]:
                         welcome(output['user'], output['channel'])
                         return None, None, None
-                if 'user' in output:
+                elif 'pug' in output['text'] and output['user'] != BOT_ID:
+                    if (randint(0,2) == 0) or output['text'] == '`grumpypug`':
+                        slack_client.api_call("chat.postMessage", channel=output['channel'], text=':grumpypug0::grumpypug1::grumpypug2:', as_user=True)
+                    return None, None, None
+                elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
+                    return output['text'].strip().lower(), output['channel'], output['user']
+                elif 'user' in output:
                     if AT_BOT in output['text']: 
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
                     elif output['text'][-1] == '?':
                         if randint(0,20) == 1:
                             sleep(1)
                             slack_client.api_call("chat.postMessage", channel=output['channel'], text=choice(DEFAULT_RESPONSES['qmark']).replace('__shrug__','¯\_(ツ)_/¯'), as_user=True)
-                elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
-                    return output['text'].strip().lower(), output['channel'], output['user']
     return None, None, None
 
 
