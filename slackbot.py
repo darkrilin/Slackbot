@@ -14,7 +14,12 @@ def handle_command(command, channel, caller):
         command = command[1::]
         
     response = choice(DEFAULT_RESPONSES['confused'])
-    if command.startswith('test'):
+
+    if 'restart' in command:
+        if name_from_id(caller)[1] in get_admins(True):
+            kill()
+    
+    elif command.startswith('test'):
         if name_from_id(caller)[1] in get_admins(True):
             command = command.replace('test ', '')
             if command.startswith('welcome'):
@@ -240,11 +245,17 @@ def check_studio_update(getval=False):
         return ""
 
 
+def kill():
+    global END
+    END = True
+
+
 # MAIN
 if __name__ == "__main__":
     BOT_ID = os.environ['SLACK_BOT_ID']
     AT_BOT = "<@" + str(BOT_ID) + ">"
     HOSTED = int(os.getenv('SLACK_HOSTED', 0))
+    END = False
 
     slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
     debug_token = os.environ['SLACK_TEST_TOKEN']
@@ -268,7 +279,7 @@ if __name__ == "__main__":
                     slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
                 slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
             check_studio_update()
-        while True:
+        while END == False:
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
                 handle_command(command, channel, caller)
