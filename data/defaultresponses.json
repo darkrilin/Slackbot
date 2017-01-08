@@ -57,7 +57,6 @@
 	"qmark": [
 		"__shrug__",
 		"Not sure how to answer that one, sorry",
-		"Have you tried turning it on and off again? ",
 		"Not sure about that",
 		"Care to elaborate?",
 		"No",
@@ -65,10 +64,8 @@
 		"Probably",
 		"Maybe",
 		"I don't know",
-		"I'd go with the latter option",
 		"Try asking in <#C0SMJRAA0|help>",
 		"Your question might be better answered in <#C0SMJRAA0|help>",
-		"Definitely",
-		"GET ON THE FLOOR! EVERYBODY WALK THE DINOSAUR."
+		"Definitely"
 	]
 }

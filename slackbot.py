@@ -88,10 +88,11 @@ def parse_slack_output(slack_rtm_output):
                 elif 'user' in output:
                     if AT_BOT in output['text']: 
                         return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
-                    elif output['text'][-1] == '?':
+                    '''elif output['text'][-1] == '?':
                         if randint(0,20) == 1:
-                            sleep(1)
+                            sleep(randint(2,20))
                             slack_client.api_call("chat.postMessage", channel=output['channel'], text=choice(DEFAULT_RESPONSES['qmark']).replace('__shrug__','¯\_(ツ)_/¯'), as_user=True)
+                    '''
     return None, None, None
 
 
