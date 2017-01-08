@@ -66,8 +66,8 @@ def handle_command(command, channel, caller):
         
     elif command.startswith('ping'):
         response = 'Pong!'
-
-    elif command.startwith('feedback'):
+        
+    elif command.startswith('feedback'):
         response = "https://goo.gl/forms/hF5IKrx0KQMz3s052"
         
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
