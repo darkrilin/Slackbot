@@ -116,15 +116,18 @@ def get_help(admin=False, subcommand=""):
     if admin:
         if subcommand == "":
             return "```Commands:\
-\nget*   -  get slack status values\nhelp   -  shows a list of commands (duh!)\
-\nping   -  pings the bot host\ntest*  -  testing bot functions\
+\nget*   -  get slack status values\
+\nhelp   -  shows a list of commands (duh!)\
+\nping   -  pings the bot host\
+\ntest*  -  testing bot functions\
 \nrules  -  shows a list of the rules\
+\nfeedback - get link to feedback form\
 \n\n* type 'help [command]' to view full command```"
         else:
             if subcommand == "get":
                 return "```Fetches data from the slack client\nUsage: get [admins|users|name|channel|id] (value)```"
             elif subcommand == "test":
-                return "```Tests bot system commands\nUsage: test [welcome|update]```"
+                return "```Tests bot system commands\nUsage: test [welcome|update] (id)```"
             else:
                 return "Can't find command: " + subcommand
     else:
@@ -132,7 +135,8 @@ def get_help(admin=False, subcommand=""):
             return "```Commands:\
 \nhelp  -  shows a list of commands (duh!)\
 \nping  -  pings the bot host\
-\nrules -  shows a list of the rules```"
+\nrules -  shows a list of the rules\
+\nfeedback - get link to feedback form```"
         else:
             return "Can't find command: " + subcommand
 
