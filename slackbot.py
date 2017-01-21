@@ -10,16 +10,9 @@ from datetime import datetime
 
 # SLACK FUNCTIONS
 def handle_command(command, channel, caller):
-    if command.startswith(':'):
-        command = command[1::]
-        
-    response = choice(DEFAULT_RESPONSES['confused'])
-
-    if 'restart' in command:
-        if name_from_id(caller)[1] in get_admins(True):
-            kill()
+    response = choice(DR['confused'])
     
-    elif command.startswith('test'):
+    if command.startswith('test'):
         if name_from_id(caller)[1] in get_admins(True):
             command = command.replace('test ', '')
             if command.startswith('welcome'):
@@ -30,7 +23,7 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'test')
         else:
-            response = choice(DEFAULT_RESPONSES['badresponse'])
+            response = choice(DR['badresponse'])
             
     elif command.startswith('get'):
         if name_from_id(caller)[1] in get_admins(True):
@@ -55,7 +48,7 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'get')
         else:
-            response = choice(DEFAULT_RESPONSES['badresponse'])
+            response = choice(DR['badresponse'])
             
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
@@ -65,7 +58,7 @@ def handle_command(command, channel, caller):
         response = get_rules()
         
     elif command.startswith('ping'):
-        response = 'Pong!'
+        response = 'Ping!'
         
     elif command.startswith('feedback'):
         response = "https://goo.gl/forms/hF5IKrx0KQMz3s052"
@@ -89,27 +82,23 @@ def parse_slack_output(slack_rtm_output):
                 elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                     return output['text'].strip().lower(), output['channel'], output['user']
                 elif 'user' in output:
-                    if AT_BOT in output['text']: 
-                        return output['text'].split(AT_BOT)[1].strip().lower(), output['channel'], output['user']
-                    '''elif output['text'][-1] == '?':
-                        if randint(0,20) == 1:
-                            sleep(randint(2,20))
-                            slack_client.api_call("chat.postMessage", channel=output['channel'], text=choice(DEFAULT_RESPONSES['qmark']).replace('__shrug__','¯\_(ツ)_/¯'), as_user=True)
-                    '''
+                    if output['text'].startswith(AT_BOT):
+                        return output['text'].split(AT_BOT)[1].lower().strip(), output['channel'], output['user']
+                    elif output['text'].lower().startswith('meta'):
+                        return output['text'].lower().split('meta')[1].strip(), output['channel'], output['user']
+                    elif output['text'].startswith('!m'):
+                        return output['text'].split('!m')[1].lower().strip(), output['channel'], output['user']
+
     return None, None, None
 
 
 # COMMANDS
 def welcome(userid, channel):
     userid = userid.upper()
-    slack_client.api_call('chat.postMessage', channel=channel, text=choice(DEFAULT_RESPONSES['greetings']).replace('X',name_from_id(userid)[1]), as_user=True)
+    slack_client.api_call('chat.postMessage', channel=channel, text=choice(DR['greetings']).replace('<N>',name_from_id(userid)[1]), as_user=True)
     slack_client.api_call('chat.postMessage', channel=userid,
-                          text=DEFAULT_RESPONSES['intro'].replace('<NAME>', name_from_id(userid)[1]).replace('<ADMINS>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1]), as_user=True)
+                          text=DR['intro'][0].replace('<N>', name_from_id(userid)[1]).replace('<A>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1]), as_user=True)
     return ''
-
-
-def ping():
-    slack_client.api_call("chat.postMessage", channel='G1WARM8QM', text="Ping!", as_user=True)
 
 
 def get_help(admin=False, subcommand=""):
@@ -142,13 +131,13 @@ def get_help(admin=False, subcommand=""):
 
 
 def get_rules():
-    return DEFAULT_RESPONSES['rules'].replace('<ADMINS>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1])
+    return DR['rules'][0].replace('<A>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1])
 
 
-def get_channels(justnames=False, channel=""):
+def get_channels(only_names=False, channel=""):
     userlist = slack_client.api_call('channels.list', token=debug_token)
     if channel == "":
-        if justnames == True:
+        if only_names == True:
             namelist = []
             for i in userlist['channels']:
                 if i['is_archived'] == False:
@@ -226,6 +215,9 @@ def id_from_name(username):
 
 
 def check_studio_update(getval=False):
+    return ""
+    # Gamemaker:studio update checker:
+    '''
     urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
     isupdate = False
     response = "*No updates available*\n"
@@ -251,11 +243,8 @@ def check_studio_update(getval=False):
         if isupdate:
             slack_client.api_call("chat.postMessage", channel=get_channels(True, 'lounge')[1], text=response, as_user=True)
         return ""
+    '''
 
-
-def kill():
-    global END
-    END = True
 
 
 # MAIN
@@ -269,24 +258,31 @@ if __name__ == "__main__":
     debug_token = os.environ['SLACK_TEST_TOKEN']
 
     with open('data/defaultresponses.json') as data_file:
-        DEFAULT_RESPONSES = json.load(data_file)
+        DR = json.load(data_file)
 
     with open('data/selfintro.json') as data_file:
-        SELF_INTRODUCTION = json.load(data_file)
+        SELF_INTRO = json.load(data_file)
 
     READ_WEBSOCKET_DELAY = 1
     if slack_client.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
-        if HOSTED == 1:
-            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Bot starting.", as_user=True)
-            if randint(0,24) == 1:
-                depressed_text = choice(DEFAULT_RESPONSES['depressed'])
+
+        # This code only runs when the bot is on the server
+        if HOSTED:
+            # Hello world start
+            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Starting..", as_user=True)
+            # Random chance for bot to say something in #lounge
+            if randint(0,20) == 1:
+                depressed_text = choice(DR['depressed'])
                 if "Hehehe" in depressed_text:
-                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRODUCTION, as_user=True)
+                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRO, as_user=True)
                 else:
                     slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
                 slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
+            # Bot checks for and announces updates to gamemaker studio
             check_studio_update()
+
+        # Main loop; bot checks for message, responds, sleeps, repeats
         while END == False:
             command, channel, caller = parse_slack_output(slack_client.rtm_read())
             if command and channel:
