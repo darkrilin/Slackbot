@@ -23,7 +23,7 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'test')
         else:
-            response = choice(DR['badresponse'])
+            response = choice(DR['bad_response'])
             
     elif command.startswith('get'):
         if name_from_id(caller)[1] in get_admins(True):
@@ -48,7 +48,7 @@ def handle_command(command, channel, caller):
             else:
                 response = get_help(True, 'get')
         else:
-            response = choice(DR['badresponse'])
+            response = choice(DR['bad_response'])
             
     elif command.startswith('help'):
         command = command.replace('help', '').replace(' ', '')
@@ -63,7 +63,7 @@ def handle_command(command, channel, caller):
     elif command.startswith('feedback'):
         response = "https://goo.gl/forms/hF5IKrx0KQMz3s052"
         
-    slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+    sc.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 
 def parse_slack_output(slack_rtm_output):
@@ -77,7 +77,7 @@ def parse_slack_output(slack_rtm_output):
                         return None, None, None
                 elif 'pug' in output['text'] and output['user'] != BOT_ID:
                     if (randint(0,2) == 0) or output['text'] == '`grumpypug`':
-                        slack_client.api_call("chat.postMessage", channel=output['channel'], text=':grumpypug0::grumpypug1::grumpypug2:', as_user=True)
+                        sc.api_call("chat.postMessage", channel=output['channel'], text=':grumpypug0::grumpypug1::grumpypug2:', as_user=True)
                     return None, None, None
                 elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                     return output['text'].strip().lower(), output['channel'], output['user']
@@ -95,8 +95,8 @@ def parse_slack_output(slack_rtm_output):
 # COMMANDS
 def welcome(userid, channel):
     userid = userid.upper()
-    slack_client.api_call('chat.postMessage', channel=channel, text=choice(DR['greetings']).replace('<N>',name_from_id(userid)[1]), as_user=True)
-    slack_client.api_call('chat.postMessage', channel=userid,
+    sc.api_call('chat.postMessage', channel=channel, text=choice(DR['greetings']).replace('<N>',name_from_id(userid)[1]), as_user=True)
+    sc.api_call('chat.postMessage', channel=userid,
                           text=DR['intro'][0].replace('<N>', name_from_id(userid)[1]).replace('<A>', '@'+', @'.join(get_admins(True)[:-1])+' &amp; @'+get_admins(True)[-1]), as_user=True)
     return ''
 
@@ -135,7 +135,7 @@ def get_rules():
 
 
 def get_channels(only_names=False, channel=""):
-    userlist = slack_client.api_call('channels.list', token=debug_token)
+    userlist = sc.api_call('channels.list', token=debug_token)
     if channel == "":
         if only_names == True:
             namelist = []
@@ -153,7 +153,7 @@ def get_channels(only_names=False, channel=""):
 
 
 def get_users(justnames=False):
-    userlist = slack_client.api_call('users.list', token=debug_token)
+    userlist = sc.api_call('users.list', token=debug_token)
     if justnames == True:
         namelist = []
         for i in userlist['members']:
@@ -164,7 +164,7 @@ def get_users(justnames=False):
 
 
 def get_user_ids():
-    userlist = slack_client.api_call('users.list', token=debug_token)
+    userlist = sc.api_call('users.list', token=debug_token)
     idlist = []
     for i in userlist['members']:
         idlist += [i['id']]
@@ -172,7 +172,7 @@ def get_user_ids():
 
 
 def get_admins(justnames=False):
-    userlist = slack_client.api_call('users.list', token=debug_token)
+    userlist = sc.api_call('users.list', token=debug_token)
     namelist = []
     for i in userlist['members']:
         if 'is_admin' in i.keys():
@@ -215,35 +215,11 @@ def id_from_name(username):
 
 
 def check_studio_update(getval=False):
+    # The update checker for gamemaker studio has been removed since it is not being updated regularly anymore
+    # This now checks for updates to gamemaker studio 2
+    RSS = request.urlopen('http://gms.yoyogames.com/update-win.rss')
+    print(RSS.read())
     return ""
-    # Gamemaker:studio update checker:
-    '''
-    urls = ['http://gmapi.gnysek.pl/version/gmstudio','http://gmapi.gnysek.pl/version/gmstudiobeta','http://gmapi.gnysek.pl/version/gmstudioea']
-    isupdate = False
-    response = "*No updates available*\n"
-    for i in urls:
-        source = literal_eval(str(request.urlopen(i).read())[2:-1])
-        if isupdate == False:
-            for i in source:
-                name = str(i)
-                daysago = source[name]['daysAgo']
-                if daysago == '0':
-                    isupdate = True
-                    if name == 'gmstudio':
-                        response = "GameMaker:Studio updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
-                    elif name == 'gmstudiobeta':
-                        response = "GameMaker:Studio *Beta* updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio/release-notes-studio.html"
-                    elif name == 'gmstudioea':
-                        response = "GameMaker:Studio Early Access updated to v" + source[name]['version'] + "! http://store.yoyogames.com/downloads/gm-studio-ea/release-notes-studio.html"
-                else:
-                    response += name.replace('gmstudiobeta','GameMaker:Studio *Beta*').replace('gmstudioea','GameMaker:Studio *_Early Access_*').replace('gmstudio','GameMaker:Studio') + " last updated to v" + source[name]['version'] + ", " + str(daysago) + " days ago\n"
-    if getval:
-        return isupdate,response
-    else:
-        if isupdate:
-            slack_client.api_call("chat.postMessage", channel=get_channels(True, 'lounge')[1], text=response, as_user=True)
-        return ""
-    '''
 
 
 
@@ -254,7 +230,7 @@ if __name__ == "__main__":
     HOSTED = int(os.getenv('SLACK_HOSTED', 0))
     END = False
 
-    slack_client = SlackClient(os.environ['SLACK_BOT_TOKEN'])
+    sc = SlackClient(os.environ['SLACK_BOT_TOKEN'])
     debug_token = os.environ['SLACK_TEST_TOKEN']
 
     with open('data/defaultresponses.json') as data_file:
@@ -263,28 +239,29 @@ if __name__ == "__main__":
     with open('data/selfintro.json') as data_file:
         SELF_INTRO = json.load(data_file)
 
-    READ_WEBSOCKET_DELAY = 1
-    if slack_client.rtm_connect():
+    READ_WEBSOCKET_DELAY = .5
+    if sc.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
 
         # This code only runs when the bot is on the server
         if HOSTED:
             # Hello world start
-            slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Starting..", as_user=True)
+            sc.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Starting..", as_user=True)
             # Random chance for bot to say something in #lounge
             if randint(0,20) == 1:
                 depressed_text = choice(DR['depressed'])
                 if "Hehehe" in depressed_text:
-                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRO, as_user=True)
+                    sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRO, as_user=True)
                 else:
-                    slack_client.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
-                slack_client.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
+                    sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
+                sc.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
             # Bot checks for and announces updates to gamemaker studio
             check_studio_update()
 
         # Main loop; bot checks for message, responds, sleeps, repeats
+        check_studio_update()
         while END == False:
-            command, channel, caller = parse_slack_output(slack_client.rtm_read())
+            command, channel, caller = parse_slack_output(sc.rtm_read())
             if command and channel:
                 handle_command(command, channel, caller)
             sleep(READ_WEBSOCKET_DELAY)

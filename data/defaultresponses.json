@@ -14,8 +14,7 @@
 		"Welcome, <N>!",
 		"Oh, hello <N>!",
 		"Hello <N>!",
-		"You can make up your mind whether you think they're funny or not—here's <N>.",
-        "Sorry to interrupt everybody. Welcome to the official gamemaker slack <N>!",
+        "Sorry to interrupt, but welcome to the official gamemaker slack <N>!",
         "Welcome to the club, <N>.",
         "It is my pleasure today to introduce <N>. Welcome to the official gamemaker slack, buddy!"
 	],
@@ -39,7 +38,7 @@
 		"What?",
 		"Error: I do not understand"
 	],
-	"badresponse": [
+	"bad_response": [
         "You are not allowed to do that.",
 		"You are not permitted to perform that action.",
 		"Access Denied."
