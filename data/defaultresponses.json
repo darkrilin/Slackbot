@@ -1,6 +1,6 @@
 {
 	"intro": [
-		"Hi <N>! \nWe have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nIf you have any suggestions or wanna hurl abuse at our hotpockets, your targets are <A>. \n\nWe suggest that you join some of our other channels:\nJoin <#C1SAV0NNR|gamejams> if you wanna slam and do the space jam.\n<#C0KNZQ7K6|bitching> is great if you want to blow off some steam."
+		"Hi <N>! \nWe have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nIf you have any suggestions or wanna hurl abuse at our hotpockets, your targets are <A>. \n\nWe suggest that you join some of our other channels:\nGather in <#C1SAV0NNR|gamejams> if you wanna slam and do the space jam.\n<#C0KNZQ7K6|bitching> is great if you want to blow off some steam.\nTry out <#C25F64CRF|the_big_topic> for week-long discussions on different concepts in game design and development"
 	],
 	"rules": [
 		"We have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nFinally, if you have any questions, feel free to hurl abuse at our hotpockets. Your targets are <A>."
@@ -25,7 +25,9 @@
 		"Are you sure?",
 		"Please explain",
 		"Are you certain?",
-		"Error: function not found",
+		"Error: Function not found",
+        "Error: Obsolete language detected",
+        "HTTP 404",
 		"Incorrect input",
 		"What do you mean?",
 		"I am not sure I understand",
@@ -40,7 +42,8 @@
 	"bad_response": [
         "You are not allowed to do that.",
 		"You are not permitted to perform that action.",
-		"Access Denied."
+		"Access Denied.",
+        "Not so fast!"
     ],
 	"depressed": [
 		"Funny, how just when you think life can't possibly get any worse it suddenly does.",
