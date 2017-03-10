@@ -62,7 +62,13 @@ def handle_command(command, channel, caller):
         
     elif command.startswith('feedback'):
         response = "https://goo.gl/forms/hF5IKrx0KQMz3s052"
-        
+
+    elif command.startswith("ghost"): # THIS FUNCTION SHOULD ONLY WORK FOR RILIN
+        if name_from_id(caller)[1] in get_admins(True):
+            command = command.replace('ghost ', '')
+            channel = command[:9]
+            response = command[10:]
+
     sc.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 
@@ -79,6 +85,8 @@ def parse_slack_output(slack_rtm_output):
                     if (randint(0,2) == 0) or output['text'] == '`grumpypug`':
                         sc.api_call("chat.postMessage", channel=output['channel'], text=':grumpypug0::grumpypug1::grumpypug2:', as_user=True)
                     return None, None, None
+                elif 'ghost' in output['text'] and output['user'] == 'U1NQUSSEQ':
+                    return output['text'], output['channel'], output['user']
                 elif output['channel'][0] == 'D' and output['user'] != BOT_ID:
                     return output['text'].strip().lower(), output['channel'], output['user']
                 elif 'user' in output:
@@ -218,7 +226,7 @@ def check_studio_update(getval=False):
     # The update checker for gamemaker studio has been removed since it is not being updated regularly anymore
     # This now checks for updates to gamemaker studio 2
     RSS = request.urlopen('http://gms.yoyogames.com/update-win.rss')
-    print(RSS.read())
+    #print(RSS.read())
     return ""
 
 
