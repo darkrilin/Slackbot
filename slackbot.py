@@ -256,7 +256,7 @@ if __name__ == "__main__":
             # Hello world start
             sc.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Starting..", as_user=True)
             # Random chance for bot to say something in #lounge
-            if randint(0,20) == 1:
+            if randint(0,40) == 1:
                 depressed_text = choice(DR['depressed'])
                 if "Hehehe" in depressed_text:
                     sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRO, as_user=True)
