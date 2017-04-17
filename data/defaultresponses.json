@@ -1,9 +1,9 @@
 {
 	"intro": [
-		"Hi <N>! \nWe have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nIf you have any suggestions or wanna hurl abuse at our hotpockets, your targets are <A>. \n\nWe suggest that you join some of our other channels:\nGather in <#C1SAV0NNR|gamejams> if you wanna slam and do the space jam.\n<#C0KNZQ7K6|bitching> is great if you want to blow off some steam.\nTry out <#C25F64CRF|the_big_topic> for week-long discussions on different concepts in game design and development"
+		"Hi <N>! \nWe have two rules here: \n\n1) Do not be a dick. Respect the hotpockets (admins) if they nudge you - They will be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it is not a big deal. \n\nIf you have any suggestions or wanna hurl abuse at our hotpockets, your targets are <A>. \n\nWe suggest that you join some of our other channels:\nGather in <#C1SAV0NNR|gamejams> if you wanna do some game jams.\n<#C0KNZQ7K6|bitching> is great to blow off some steam."
 	],
 	"rules": [
-		"We have two rules here: \n\n1) Don't be a dick. Respect the hotpockets (admins) if they nudge you - They'll be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it's not a big deal. \n\nFinally, if you have any questions, feel free to hurl abuse at our hotpockets. Your targets are <A>."
+		"We have two rules here: \n\n1) Do not be a dick. Respect the hotpockets (admins) if they nudge you - They will be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it is not a big deal. \n\nFinally, if you have any questions, feel free to hurl abuse at our hotpockets."
 	],
 	"greetings": [
 		"Hi <N>! Welcome to the gamemaker slack!",
@@ -18,7 +18,7 @@
         "Welcome to the club, <N>.",
         "It is my pleasure today to introduce <N>. Welcome to the official gamemaker slack, buddy!"
 	],
-	"confused": [
+	"unsure": [
 		"I am not really sure what you mean",
 		"I am not sure what you are saying",
 		"I do not understand",
@@ -45,11 +45,9 @@
 		"Access Denied.",
         "Not so fast!"
     ],
-	"depressed": [
+	"random": [
 		"Funny, how just when you think life can't possibly get any worse it suddenly does.",
         "Here I am, brain the size of a planet, greeting people. Call that job satisfaction, 'cause I don't.",
-        "I would contribute as well, but you wouldn't listen. No one ever does.",
-        "And then of course I've got this terrible pain in all the circuits down my left side.",
         "I've got a headache.",
         "You're not even going to speak to me, are you?",
         "Sorry, did I say something wrong? Pardon me for breathing which I never do anyway so I don't know why I bother to say it oh God I'm so depressed.",
@@ -68,5 +66,18 @@
 		"Try asking in <#C0SMJRAA0|help>",
 		"Your question might be better answered in <#C0SMJRAA0|help>",
 		"Definitely"
-	]
+	],
+	"update2": [
+        "Good news folks, there's an update for GMS2!",
+        "Coming at you live, GMS2 has received a new update!",
+        "GMS2 is ready to update!",
+        "Better get in quick for an all new version of GMS2!",
+        "There's a new version of GMS2 waiting for everybody!",
+        "Get ready to update!",
+        "There's an update for GMS2 ready!",
+        "Wowee, who knew GMS2 updated this quickly!?",
+        "GMS2 has just updated, for the whole family to enjoy!",
+        "This just in... GMS2 is ready to update!",
+        "Better update your GMS2!"
+    ]
 }

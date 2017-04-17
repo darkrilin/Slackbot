@@ -1,1 +1,1 @@
-worker: python slackbot.py
+worker: python meta.py

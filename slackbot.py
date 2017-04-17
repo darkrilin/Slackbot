@@ -244,24 +244,19 @@ if __name__ == "__main__":
     with open('data/defaultresponses.json') as data_file:
         DR = json.load(data_file)
 
-    with open('data/selfintro.json') as data_file:
-        SELF_INTRO = json.load(data_file)
-
     READ_WEBSOCKET_DELAY = .5
     if sc.rtm_connect():
         print("Bot connected and running! " + str(AT_BOT))
 
-        # This code only runs when the bot is on the server
+        # This code only runs when the bot is on the
+        # server
         if HOSTED:
             # Hello world start
             sc.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="Starting..", as_user=True)
             # Random chance for bot to say something in #lounge
             if randint(0,40) == 1:
                 depressed_text = choice(DR['depressed'])
-                if "Hehehe" in depressed_text:
-                    sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text="", attachments=SELF_INTRO, as_user=True)
-                else:
-                    sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
+                sc.api_call('chat.postMessage', channel=get_channels(True, 'lounge')[1], text=depressed_text, as_user=True)
                 sc.api_call("chat.postMessage", channel=id_from_name('rilin')[1], text="I'm not feeling too well...", as_user=True)
             # Bot checks for and announces updates to gamemaker studio
             check_studio_update()
