@@ -120,10 +120,12 @@ def parse_slack_output(slack_rtm_output):
                         elif output["text"].startswith("meta"):
                             return output["text"].lower().strip(), output["channel"], output["user"]
 
-            elif output["type"] == "channel_join":
+            elif output["type"] == "channel_join" or ("subtype" in output and output["subtype"] == "channel_join"):
                 # New user joins
+                client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="New user: " + output["user"], as_user=True)
                 if output["channel"] == get_channel_id("lounge"):
                     welcome_user(output["user"], output["channel"])
+
 
     return None, None, None
 
