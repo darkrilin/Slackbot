@@ -106,7 +106,13 @@ def parse_slack_output(slack_rtm_output):
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
         for output in output_list:
-            if output["type"] == "message":
+            if output["type"] == "channel_join" or ("subtype" in output and output["subtype"] == "channel_join"):
+                # New user joins
+                client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="New user: " + output["user"], as_user=True)
+                if output["channel"] == get_channel_id("lounge"):
+                    welcome_user(output["user"], output["channel"])
+
+            elif output["type"] == "message":
                 # Normal message responses
                 if "text" in output and "channel" in output:
                     if output["channel"][0] == "D" and output["user"] != BOT_ID:
@@ -119,12 +125,6 @@ def parse_slack_output(slack_rtm_output):
                             return output["text"].split(BOT_NAME)[1].lower().strip(), output["channel"], output["user"]
                         elif output["text"].startswith("meta"):
                             return output["text"].lower().strip(), output["channel"], output["user"]
-
-            elif output["type"] == "channel_join" or ("subtype" in output and output["subtype"] == "channel_join"):
-                # New user joins
-                client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="New user: " + output["user"], as_user=True)
-                if output["channel"] == get_channel_id("lounge"):
-                    welcome_user(output["user"], output["channel"])
 
 
     return None, None, None
