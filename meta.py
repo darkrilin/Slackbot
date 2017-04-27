@@ -39,8 +39,9 @@ def get_admins():
     users = get_users()
     names = []
     for i in users["members"]:
-        if i["is_admin"]:
-            names.append(i["name"])
+        if "is_admin" in i:
+            if i["is_admin"]:
+                names.append(i["name"])
     return names
 
 
@@ -63,7 +64,7 @@ def get_user_name(id):
 def welcome_user(id, channel):
     name = get_user_name(id)
     client.api_call("chat.postMessage", channel=channel, text=choice(DEFAULT["greetings"]).replace("<N>", name), as_user=True)
-    client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0].replace("<N>", name).replace("<A>", "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins(True)[-1]), as_user=True)
+    client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0].replace("<N>", name).replace("<A>", "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1]), as_user=True)
 
 
 def studio_update(force_print=False):
