@@ -116,7 +116,7 @@ def parse_slack_output(slack_rtm_output):
             elif output["type"] == "message":
                 # Normal message responses
                 if "text" in output and "channel" in output:
-                    if output["channel"][0] == "D" and output["user"] != BOT_ID:
+                    if output["channel"][0] == "D" and "user" in ouput and output["user"] != BOT_ID:
                         # Direct message to bot
                         return output["text"].lower().strip(), output["channel"], output["user"]
 
