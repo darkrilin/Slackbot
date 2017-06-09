@@ -1,3 +1,8 @@
+#
+# NOTE: THIS IS AN OLDER VERSION AND IS
+#       CURRENTLY BEING RECODED INTO SOMETHING BETTER
+#
+
 import os
 import json
 from urllib import request

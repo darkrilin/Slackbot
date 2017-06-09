@@ -1,3 +1,9 @@
+##
+# meta, created by @darkrilin
+# for the gamemakerdevs slack community
+#
+##
+
 from slackclient import SlackClient
 from os import environ, getenv
 from urllib import request
@@ -61,10 +67,25 @@ def get_user_name(id):
     return None
 
 
-def welcome_user(id, channel):
+def get_rules():
+    # Fetch rules hosted from pastebin
+    rules = bytes.decode(request.urlopen("https://pastebin.com/raw/Q7R4rv6V").read())
+    if (rules[-1] != " "):
+        rules += " "
+    return rules
+
+
+def welcome_user(id="", channel=""):
+    rules = get_rules()
     name = get_user_name(id)
+
+    # introduce user in #lounge
     client.api_call("chat.postMessage", channel=channel, text=choice(DEFAULT["greetings"]).replace("<N>", name), as_user=True)
-    client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0].replace("<N>", name).replace("<A>", "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1]), as_user=True)
+
+    # message user rules, other info
+    client.api_call("chat.postMessage", channel=id, text="Hi <N>! Welcome to the official gamemaker slack!".replace("<N>", name), as_user=True)
+    client.api_call("chat.postMessage", channel=id, text=rules + "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1], as_user=True)
+    client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0], as_user=True)
 
 
 def studio_update(force_print=False):
@@ -137,6 +158,7 @@ def handle_command(command, channel, caller):
 
 
 if __name__ == "__main__":
+
     HOSTED = int(getenv("SLACK_HOSTED", 0))
     BOT_ID = environ["SLACK_BOT_ID"]
     BOT_NAME = "<@" + str(BOT_ID) + ">"
