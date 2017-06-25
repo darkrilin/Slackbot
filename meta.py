@@ -31,6 +31,14 @@ def get_channel_id(name):
     return None
 
 
+def get_channel_name(id):
+    channels = get_channels()
+    for i in channels["channels"]:
+        if i["id"] == id:
+            return i["name"]
+    return None
+
+
 def get_users(only_names=False):
     users = client.api_call("users.list", token=DEBUG_TOKEN)
     if only_names:
@@ -69,10 +77,17 @@ def get_user_name(id):
 
 def get_rules():
     # Fetch rules hosted from pastebin
-    rules = bytes.decode(request.urlopen("https://pastebin.com/raw/Q7R4rv6V").read())
-    if (rules[-1] != " "):
-        rules += " "
+    rules = bytes.decode(request.urlopen("https://pastebin.com/raw/Hm5hHjbB").read())
     return rules
+
+
+def get_joke():
+    try:
+        jokes = bytes.decode(request.urlopen("https://pastebin.com/raw/qvucRTSE").read())
+        jokes = jokes.split("\r\n***\r\n")
+        return choice(jokes)
+    except:
+        return "Joke database could not be loaded"
 
 
 def welcome_user(id="", channel=""):
@@ -84,7 +99,7 @@ def welcome_user(id="", channel=""):
 
     # message user rules, other info
     client.api_call("chat.postMessage", channel=id, text="Hi <N>! Welcome to the official gamemaker slack!".replace("<N>", name), as_user=True)
-    client.api_call("chat.postMessage", channel=id, text=rules + "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1], as_user=True)
+    client.api_call("chat.postMessage", channel=id, text=rules, as_user=True)# + "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1], as_user=True)
     client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0], as_user=True)
 
 
@@ -141,7 +156,7 @@ def parse_slack_output(slack_rtm_output):
                         # Direct message to bot
                         return output["text"].lower().strip(), output["channel"], output["user"]
 
-                    elif output["channel"][0] == "C":
+                    elif output["channel"][0] in ["C","G"]:
                         # Message in a group chat
                         if output["text"].startswith(BOT_NAME):
                             return output["text"].split(BOT_NAME)[1].lower().strip(), output["channel"], output["user"]
@@ -153,7 +168,20 @@ def parse_slack_output(slack_rtm_output):
 
 
 def handle_command(command, channel, caller):
+    user_name = get_user_name(caller)
+    channel_name = get_channel_name(channel)
+    is_admin = user_name in get_admins()
+
     response = choice(DEFAULT["unsure"])
+
+    if "rules" in command.lower():
+        client.api_call("chat.postMessage", channel=caller, text=get_rules(), as_user=True)
+        response = choice(DEFAULT["rules_response"])
+
+    elif "joke" in command.lower():
+        response = get_joke()
+
+
     client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 

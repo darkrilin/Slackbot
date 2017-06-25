@@ -2,8 +2,12 @@
 	"intro": [
 		"We also suggest that you join some of our other channels:\nGather in <#C1SAV0NNR|gamejams> if you wanna do some game jams.\nOh, and <#C0KNZQ7K6|bitching> is great to blow off some steam."
 	],
-	"rules": [
-		"We have two rules here: \n\n1) Do not be a dick. Respect the hotpockets (admins) if they nudge you - They will be nice, I promise. \n2) Try to keep it vaguely on-topic. At least start discussions that are on-topic, and if they wander off somewhere interesting then it is not a big deal. \n\nFinally, if you have any questions, feel free to hurl abuse at our hotpockets."
+	"rules_response":[
+		"I've sent you the rules in a DM!",
+		"Check your private messages!",
+		"I've sent you a DM!",
+		"You should receive a full list of rules via DM",
+		"Check your DMs"
 	],
 	"greetings": [
 		"Hi <N>! Welcome to the gamemaker slack!",
