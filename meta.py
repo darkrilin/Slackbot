@@ -103,12 +103,12 @@ def welcome_user(id="", channel=""):
     client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0], as_user=True)
 
 
-def studio_update(force_print=False):
+def studio_update(force_print=False, admin=False):
     update = json.loads(bytes.decode(request.urlopen("http://gmapi.gnysek.pl/version/gm2ide").read()))
     version = update["gm2ide"]["version"]
     days_ago = update["gm2ide"]["daysAgo"]
 
-    if days_ago == 0 or force_print:
+    if days_ago == 0 or force_print or (admin and days_ago <= 1):
         rss = bytes.decode(request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
         rss = rss[rss.rfind("<item>") : rss.rfind("</item>")+7]
         download = rss[rss.find("<link>")+6 : rss.find("</link>")]
@@ -135,8 +135,11 @@ def studio_update(force_print=False):
 
         client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("gms2"), text="", attachments=json.dumps(attachments))
         print("gms2 has updated to version " + version + "\n")
+        if admin:
+            return True
     else:
         print("No updates found for gms2\n")
+    return False
 
 
 def parse_slack_output(slack_rtm_output):
@@ -181,8 +184,15 @@ def handle_command(command, channel, caller):
     elif "joke" in command.lower():
         response = get_joke()
 
+    elif "update" in command.lower():
+        if is_admin:
+            if studio_update(admin=True):
+                response="GMS2 updated!"
+            else:
+                response = "No updates found"
 
-    client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+    if response != "":
+        client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
 
 if __name__ == "__main__":
