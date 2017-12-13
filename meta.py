@@ -121,8 +121,12 @@ def studio_update(force_print=False, admin=False):
                 "text": "Gamemaker Studio 2 has been updated to <http://gms.yoyogames.com/ReleaseNotes.html|version " + version + ">!",
                 "fields": [
                     {
-                        "title": "Release Notes",
+                        "title": "Summary",
                         "value": description
+                    },
+                    {
+                        "title": "Release Notes",
+                        "value": "You can read the release notes <http://gms.yoyogames.com/ReleaseNotes.html|here>!"
                     },
                     {
                         "title": "Download",
