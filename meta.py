@@ -137,7 +137,7 @@ def studio_update(force_print=False, admin=False):
             }
         ]
 
-        client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("gms2"), text="", attachments=json.dumps(attachments))
+        client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("lounge"), text="", attachments=json.dumps(attachments))
         print("gms2 has updated to version " + version + "\n")
         if admin:
             return True
