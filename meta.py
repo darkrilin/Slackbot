@@ -190,7 +190,10 @@ def handle_command(command, channel, caller):
 
     elif "update" in command.lower():
         if is_admin:
-            if studio_update(admin=True):
+            force = False
+            if "force" in command.lower():
+                force = True
+            if studio_update(admin=True, force_print=force):
                 response="GMS2 updated!"
             else:
                 response = "No updates found"
