@@ -77,30 +77,29 @@ def get_user_name(id):
 
 def get_rules():
     # Fetch rules hosted from pastebin
+    # TODO: Move these over to something like an amazon S3 instance or a server where I host my own files
     rules = bytes.decode(request.urlopen("https://pastebin.com/raw/Hm5hHjbB").read())
     return rules
 
 
 def get_joke():
-    try:
-        jokes = bytes.decode(request.urlopen("https://pastebin.com/raw/qvucRTSE").read())
-        jokes = jokes.split("\r\n***\r\n")
-        return choice(jokes)
-    except:
-        return "Joke database could not be loaded"
+    jokes = bytes.decode(request.urlopen("https://pastebin.com/raw/qvucRTSE").read())  # TODO: Same here
+    jokes = jokes.split("\r\n***\r\n")
+    return choice(jokes)
 
 
-def welcome_user(id="", channel=""):
+def welcome_user(user_id="", channel_id=""):
     rules = get_rules()
-    name = get_user_name(id)
+    name = get_user_name(user_id)
 
     # introduce user in #lounge
-    client.api_call("chat.postMessage", channel=channel, text=choice(DEFAULT["greetings"]).replace("<N>", name), as_user=True)
+    client.api_call("chat.postMessage", channel=channel_id, text=choice(resp["greetings"]).format(name), as_user=True)
 
     # message user rules, other info
-    client.api_call("chat.postMessage", channel=id, text="Hi <N>! Welcome to the official gamemaker slack!".replace("<N>", name), as_user=True)
-    client.api_call("chat.postMessage", channel=id, text=rules, as_user=True)# + "@"+", @".join(get_admins()[:-1])+" &amp; @" + get_admins()[-1], as_user=True)
-    client.api_call("chat.postMessage", channel=id, text=DEFAULT["intro"][0], as_user=True)
+    welcome_string = "Hi {}! Welcome to the official gamemaker slack!".format(name)
+    client.api_call("chat.postMessage", channel=user_id, text=welcome_string, as_user=True)
+    client.api_call("chat.postMessage", channel=user_id, text=rules, as_user=True)
+    client.api_call("chat.postMessage", channel=user_id, text=resp["intro"][0], as_user=True)
 
 
 def studio_update(force_print=False, admin=False):
@@ -108,17 +107,19 @@ def studio_update(force_print=False, admin=False):
     version = update["gm2ide"]["version"]
     days_ago = update["gm2ide"]["daysAgo"]
 
-    if days_ago == 0 or force_print or (admin and days_ago <= 1):
+    if days_ago <= 1 or force_print or admin:
         rss = bytes.decode(request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
-        rss = rss[rss.rfind("<item>") : rss.rfind("</item>")+7]
-        download = rss[rss.find("<link>")+6 : rss.find("</link>")]
-        description = rss[rss.find("<description>")+13 : rss.find("</description>")].replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")
+        rss = rss[rss.rfind("<item>"): rss.rfind("</item>")+7]
+        download = rss[rss.find("<link>")+6: rss.find("</link>")]
+        description = rss[rss.find("<description>")+13: rss.find("</description>")].replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")
+
+        rn_url = "http://gms.yoyogames.com/ReleaseNotes.html"
         attachments = [
             {
-                "fallback": "Gamemaker Studio 2 has been updated to version " + version + ": http://gms.yoyogames.com/ReleaseNotes.html",
-                "pretext": choice(DEFAULT["update2"]),
-                "title": "Version " + version,
-                "text": "Gamemaker Studio 2 has been updated to <http://gms.yoyogames.com/ReleaseNotes.html|version " + version + ">!",
+                "fallback": "Gamemaker Studio 2 has been updated to version {}: {}".format(version, rn_url),
+                "pretext": choice(resp["update2"]),
+                "title": "Version {}".format(version),
+                "text": "Gamemaker Studio 2 has been updated to <{}|version {}>!".format(rn_url, version),
                 "fields": [
                     {
                         "title": "Summary",
@@ -126,7 +127,7 @@ def studio_update(force_print=False, admin=False):
                     },
                     {
                         "title": "Release Notes",
-                        "value": "You can read the release notes <http://gms.yoyogames.com/ReleaseNotes.html|here>!"
+                        "value": "You can read the release notes <{}|here>!".format(rn_url)
                     },
                     {
                         "title": "Download",
@@ -137,12 +138,14 @@ def studio_update(force_print=False, admin=False):
             }
         ]
 
-        client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("lounge"), text="", attachments=json.dumps(attachments))
-        print("gms2 has updated to version " + version + "\n")
+        client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("lounge"),
+                        text="", attachments=json.dumps(attachments))
+        print("gms2 has updated to version {}\n".format(version))
         if admin:
             return True
     else:
         print("No updates found for gms2\n")
+
     return False
 
 
@@ -152,7 +155,8 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
             if output["type"] == "channel_join" or ("subtype" in output and output["subtype"] == "channel_join"):
                 # New user joins
-                client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="New user: " + output["user"], as_user=True)
+                msg = "New user: {}".format(output["user"])
+                client.api_call("chat.postMessage", channel=get_user_id("rilin"), text=msg, as_user=True)
                 if output["channel"] == get_channel_id("lounge"):
                     welcome_user(output["user"], output["channel"])
 
@@ -163,27 +167,25 @@ def parse_slack_output(slack_rtm_output):
                         # Direct message to bot
                         return output["text"].lower().strip(), output["channel"], output["user"]
 
-                    elif output["channel"][0] in ["C","G"]:
+                    elif output["channel"][0] in ["C", "G"]:
                         # Message in a group chat
                         if output["text"].startswith(BOT_NAME):
                             return output["text"].split(BOT_NAME)[1].lower().strip(), output["channel"], output["user"]
                         elif output["text"].startswith("meta"):
                             return output["text"].lower().strip(), output["channel"], output["user"]
 
-
     return None, None, None
 
 
 def handle_command(command, channel, caller):
     user_name = get_user_name(caller)
-    channel_name = get_channel_name(channel)
     is_admin = user_name in get_admins()
 
-    response = choice(DEFAULT["unsure"])
+    response = choice(resp["unsure"])
 
     if "rules" in command.lower():
         client.api_call("chat.postMessage", channel=caller, text=get_rules(), as_user=True)
-        response = choice(DEFAULT["rules_response"])
+        response = choice(resp["rules_response"])
 
     elif "joke" in command.lower():
         response = get_joke()
@@ -194,7 +196,7 @@ def handle_command(command, channel, caller):
             if "force" in command.lower():
                 force = True
             if studio_update(admin=True, force_print=force):
-                response= "GMS2 updated!"
+                response = "GMS2 updated!"
             else:
                 response = "No updates found"
 
@@ -213,8 +215,8 @@ if __name__ == "__main__":
 
     client = SlackClient(environ["SLACK_BOT_TOKEN"])
 
-    with open("data/defaultresponses.json") as data_file:
-        DEFAULT = json.load(data_file)
+    with open("data/responses.json") as data_file:
+        resp = json.load(data_file)
 
     if client.rtm_connect():
         print("\n----- BOT STARTING -----")
