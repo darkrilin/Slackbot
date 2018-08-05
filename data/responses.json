@@ -1,0 +1,75 @@
+{
+  "intro": [
+    "We also suggest that you join some of our other channels:\nGather in <#C1SAV0NNR|gamejams> if you wanna do some game jams.\nOh, and <#C0KNZQ7K6|bitching> is great to blow off some steam."
+  ],
+  "rules_response":[
+    "I have sent you the rules in a DM!",
+    "Check your private messages!",
+    "I have sent you a DM!",
+    "You should receive a full list of rules via DM!",
+    "Check your DMs!"
+  ],
+  "greetings": [
+    "Hi {}! Welcome to the gamemaker slack!",
+    "Hello {}, welcome to the wonderful world of the gamemaker slack!",
+    "Ladies and Gentlemen, it is my pleasure today to introduce {}!",
+    "Welcome to the gamemaker slack, {}.",
+    "Ooh we have a new person.\nHello {}!",
+    "Welcome, {}!",
+    "Oh, hello {}!",
+    "Hello {}!",
+    "Sorry to interrupt, but welcome to the official gamemaker slack {}!",
+    "Welcome to the club, {}.",
+    "It is my pleasure today to introduce {}. Welcome to the official gamemaker slack, buddy!"
+  ],
+  "unsure": [
+    "I am not really sure what you mean",
+    "I am not sure what you are saying",
+    "I do not understand",
+    "Are you sure?",
+    "Please explain",
+    "What do you mean?",
+    "I am not sure I understand",
+    "What are you saying?",
+    "Huh?",
+    "Could you explain?",
+    "What?",
+    "Thanks",
+    "Error: I do not understand"
+  ],
+  "bad_response": [
+    "You are not allowed to do that.",
+    "You are not permitted to perform that action.",
+    "Access Denied.",
+    "Not so fast!"
+  ],
+  "qmark": [
+    "__shrug__",
+    "Not sure how to answer that one, sorry",
+    "Not sure about that",
+    "Care to elaborate?",
+    "No",
+    "Yes",
+    "Probably",
+    "Maybe",
+    "I do not know",
+    "You expect me, a computer with a brain the size of a planet, to know?",
+    "Try asking in <#C0SMJRAA0|help>",
+    "Your question might be better answered in <#C0SMJRAA0|help>",
+    "Definitely",
+    "¯\_(ツ)_/¯"
+  ],
+  "update": [
+    "Good news folks, there is an update for {}!",
+    "Coming at you live, {} has received a new update!",
+    "{} is ready to update!",
+    "Better get in quick for an all new version of {}!",
+    "There is a new version of {} waiting for everybody!",
+    "Get ready to update {}!",
+    "There is an update for {} ready!",
+    "Wowee, who knew {} updated this quickly!?",
+    "{} has just updated for the whole family to enjoy!",
+    "This just in... {} is ready to update!",
+    "Time to update your {}!"
+  ]
+}
