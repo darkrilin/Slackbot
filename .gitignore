@@ -45,10 +45,8 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-environment.py
-titsbot.py
-.idea/workspace.xml
-.idea/vcs.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/slackbot.iml
+
+# PyCharm files
+.idea/
+*.xml
+*.iml
