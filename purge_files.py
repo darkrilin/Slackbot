@@ -1,81 +1,99 @@
 from urllib.parse import urlencode
 from urllib.request import urlopen
-import time
-import json
-import codecs
-import os
+from time import time
+from json import load
+from codecs import getreader
+from os import environ
 
-reader = codecs.getreader("utf-8")
+reader = getreader("utf-8")
+token = environ['SLACK_TEST_TOKEN']  # Uses legacy test API token - TODO: This will need to be updated
 
-token = os.environ['SLACK_TEST_TOKEN']
-
-#Delete files older than this:
-days = 14
-ts_to = int(time.time()) - days * 24 * 60 * 60
-
-params = dict()
+days = 14  # Purge files older than 14 days
+timestamp = int(time()) - days * 24 * 60 * 60
 
 
-def list_files():
+def list_files(slack_token, ts_to):
+    """
+    Fetches a list of all the public files on the slack server
+    :param slack_token:
+    :param ts_to: Files created before this timestamp
+    :return: List of public files
+    """
     params = {
-        'token':token,
-        'ts_to':ts_to,
-        'count':500,
+        'token': slack_token,
+        'ts_to': ts_to,
+        'count': 500,
     }
-    uri = 'https://slack.com/api/files.list'
-    response = reader(urlopen(uri + '?' + urlencode(params)))
-    return json.load(response)['files']
+
+    response = reader(urlopen('https://slack.com/api/files.list?' + urlencode(params)))
+    file_list = load(response)['files']
+
+    return file_list
 
 
-def delete_files(file_ids):
+def delete_files(file_ids, slack_token, verbose=False):
+    """
+    Deletes all files with IDs matching the given list
+    :param file_ids:
+    :param slack_token:
+    :param verbose:
+    """
     size = 0
     count = 0
     num_files = len(file_ids)
+
     for file_id in file_ids:
-        count = count + 1
+        count += 1
         params = {
-            'token':token,
-            'file':file_id
+            'token': slack_token,
+            'file': file_id
         }
 
-        uri = 'https://slack.com/api/files.info'
-        response = reader(urlopen(uri + '?' + urlencode(params)))
-        size += json.load(response)['file']['size']
+        response = reader(urlopen('https://slack.com/api/files.info?' + urlencode(params)))
+        size += load(response)['file']['size']
 
-        uri = 'https://slack.com/api/files.delete'
-        response = reader(urlopen(uri + '?' + urlencode(params)))
+        response = reader(urlopen('https://slack.com/api/files.delete?' + urlencode(params)))
+        ok = load(response)['ok']
+        mb = size / 1048576
 
-        print(count, "of", num_files, "-", file_id, json.load(response)['ok'], " ... ", '{0:.2f} MB saved'.format(size / 1048576))
+        if verbose:
+            print("{0} of {1} - {2} {3} ... {4:.2f} MB saved".format(count, num_files, file_id, ok, mb))
 
 
-def total_file_size():
+def total_file_size(slack_token, verbose=False):
+    """
+    Finds the total size of all files on the slack server
+    :param slack_token:
+    :param verbose:
+    :return:
+    """
     params = {
-        'token': token,
+        'token': slack_token,
         'count': 500,
     }
-    uri = 'https://slack.com/api/files.list'
-    response = reader(urlopen(uri + '?' + urlencode(params)))
+    response = reader(urlopen('https://slack.com/api/files.list?' + urlencode(params)))
     size = 0
 
-    file_ids = [f['id'] for f in json.load(response)['files']]
-    print(len(file_ids))
+    file_ids = [f['id'] for f in load(response)['files']]
     for file_id in file_ids:
         params = {
             'token': token,
             'file': file_id
         }
 
-        uri = 'https://slack.com/api/files.info'
-        response = reader(urlopen(uri + '?' + urlencode(params)))
-        size += json.load(response)['file']['size']
-        print('{0:.2f} MB total'.format(size / 1048576))
+        response = reader(urlopen('https://slack.com/api/files.info?' + urlencode(params)))
+        size += load(response)['file']['size']
+        mb = size / 1048576
+        if verbose:
+            print('{0:.2f} MB total'.format(mb))
 
-    return '{0:.2f} MB'.format(size / 1048576)
+    mb = size / 1048576
+    return '{0:.2f} MB'.format(mb)
 
 
-files = list_files()
-file_ids = [f['id'] for f in files]
-delete_files(file_ids)
-print(str(len(file_ids)) + " files deleted")
+if __name__ == '__main__':
+    files = [f['id'] for f in list_files(token, timestamp)]
+    delete_files(files, token, verbose=True)
 
-print(total_file_size())
+    print("{} files deleted".format(len(files)))
+    print(total_file_size(token))
