@@ -223,8 +223,7 @@ if __name__ == "__main__":
         print("\n----- BOT STARTING -----")
 
         if HOSTED:
-            client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="Starting...", as_user=True)
-            client.api_call("chat.postMessage", channel=get_channel_id("lounge"), text="Whimmy wham wham whazzle, I'm back everybody!", as_user=True)
+            client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="Starting", as_user=True)
 
         # studio_update()
 
