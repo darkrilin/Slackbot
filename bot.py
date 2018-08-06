@@ -114,11 +114,14 @@ def studio_update(force_print=False, admin=False):
     version = update["gm2ide"]["version"]
     days_ago = update["gm2ide"]["daysAgo"]
 
-    if days_ago <= 1 or force_print or admin:
+    if days_ago <= 1 or (force_print and admin):
         rss = bytes.decode(request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
         rss = rss[rss.rfind("<item>"): rss.rfind("</item>")+7]
         download = rss[rss.find("<link>")+6: rss.find("</link>")]
-        description = rss[rss.find("<description>")+13: rss.find("</description>")].replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")
+        description = rss[rss.find("<description>")+13: rss.find("</description>")]
+        description = description.replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")  # remove p tags
+        description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove b tags
+        description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove u tags
 
         rn_url = "http://gms.yoyogames.com/ReleaseNotes.html"
         version_name = "GMS2"
