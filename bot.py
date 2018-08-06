@@ -12,46 +12,53 @@ from time import sleep
 import json
 
 
-def get_channels(only_names=False):
+def get_channels():
     channels = client.api_call("channels.list", token=DEBUG_TOKEN)
-    if only_names:
-        names = []
-        for i in channels["channels"]:
-            if not i["is_archived"]:
-                names.append(i["name"], i["id"])
-        return names
     return channels
 
 
-def get_channel_id(name):
+def get_channel_names():
+    channels = get_channels()
+    names = []
+    for i in channels["channels"]:
+        if not i["is_archived"]:
+            names.append(i["name"], i["id"])
+    return names
+
+
+def get_channel_id(channel_name):
     channels = get_channels()
     for i in channels["channels"]:
-        if i["name"] == name:
+        if i["name"] == channel_name:
             return i["id"]
     return None
 
 
-def get_channel_name(id):
+def get_channel_name(channel_id):
     channels = get_channels()
     for i in channels["channels"]:
-        if i["id"] == id:
+        if i["id"] == channel_id:
             return i["name"]
     return None
 
 
-def get_users(only_names=False):
+def get_users():
     users = client.api_call("users.list", token=DEBUG_TOKEN)
-    if only_names:
-        names = []
-        for i in users["members"]:
-            names.append(i["name"])
-        return names
     return users
+
+
+def get_user_names():
+    users = get_users()
+    names = []
+    for i in users["members"]:
+        names.append(i["name"])
+    return names
 
 
 def get_admins():
     users = get_users()
     names = []
+    print(users)
     for i in users["members"]:
         if "is_admin" in i:
             if i["is_admin"]:
@@ -59,18 +66,18 @@ def get_admins():
     return names
 
 
-def get_user_id(name):
+def get_user_id(user_name):
     users = get_users()
     for i in users["members"]:
-        if i["name"] == name:
+        if i["name"] == user_name:
             return i["id"]
     return None
 
 
-def get_user_name(id):
+def get_user_name(user_id):
     users = get_users()
     for i in users["members"]:
-        if i["id"] == id:
+        if i["id"] == user_id:
             return i["name"]
     return None
 
