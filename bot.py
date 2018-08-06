@@ -114,12 +114,13 @@ def studio_update(force_print=False, admin=False):
         description = rss[rss.find("<description>")+13: rss.find("</description>")].replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")
 
         rn_url = "http://gms.yoyogames.com/ReleaseNotes.html"
+        version_name = "GMS2"
         attachments = [
             {
-                "fallback": "Gamemaker Studio 2 has been updated to version {}: {}".format(version, rn_url),
-                "pretext": choice(resp["update2"]),
+                "fallback": "{0} has been updated to version {1}: {2}".format(version_name, version, rn_url),
+                "pretext": choice(resp["update"]).format(version_name),
                 "title": "Version {}".format(version),
-                "text": "Gamemaker Studio 2 has been updated to <{}|version {}>!".format(rn_url, version),
+                "text": "{0} has been updated to <{2}|version {1}>!".format(version_name, version, rn_url),
                 "fields": [
                     {
                         "title": "Summary",
@@ -207,13 +208,13 @@ def handle_command(command, channel, caller):
 if __name__ == "__main__":
 
     HOSTED = int(getenv("SLACK_HOSTED", 0))
-    BOT_ID = environ["SLACK_BOT_ID"]
+    BOT_ID = getenv("SLACK_BOT_ID", None)
     BOT_NAME = "<@" + str(BOT_ID) + ">"
 
     DEBUG_TOKEN = environ["SLACK_TEST_TOKEN"]
     WEBSOCKET_DELAY = .5
 
-    client = SlackClient(environ["SLACK_BOT_TOKEN"])
+    client = SlackClient(getenv("SLACK_BOT_TOKEN", 0))
 
     with open("data/responses.json") as data_file:
         resp = json.load(data_file)
@@ -223,8 +224,9 @@ if __name__ == "__main__":
 
         if HOSTED:
             client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="Starting...", as_user=True)
+            client.api_call("chat.postMessage", channel=get_channel_id("general"), text="Whimmy wham wham wazzle, I'm back everybody!", as_user=True)
 
-        studio_update()
+        # studio_update()
 
         while True:
             command, channel, caller = parse_slack_output(client.rtm_read())
