@@ -120,10 +120,20 @@ def studio_update(force_print=False, admin=False, cmd_channel=""):
         rss = rss[rss.rfind("<item>"): rss.rfind("</item>")+7]
         download = rss[rss.find("<link>")+6: rss.find("</link>")]
         description = rss[rss.find("<description>")+13: rss.find("</description>")]
-        description = description.replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "\n")  # remove p tags
-        description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove b tags
-        description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove u tags
 
+        # properly format the description html into slack's markdown
+        description = description.replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "\n\n")
+        description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")
+        description = description.replace("&lt;ul&gt;", "\n\n").replace("&lt;/ul&gt;", "")
+        description = description.replace("&lt;li&gt;", "- ").replace("&lt;/li&gt;", "\n")
+
+        while '&lt;a' in description:
+            a = description[description.find('&lt;a'): description.find('&lt;/a&gt;')+10]
+            href = a[a.find('href="')+6: a.find('"', a.find('href="')+6)]
+            word = a[a.find('&gt;')+4: a.find('&lt;/a&gt;')]
+            description = description.replace(a, "<{}|{}>".format(href, word))
+
+        # post release notes in chat
         rn_url = "http://gms.yoyogames.com/ReleaseNotes.html"
         version_name = "GMS2"
         attachments = [
