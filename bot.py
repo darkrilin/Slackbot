@@ -120,7 +120,7 @@ def studio_update(force_print=False, admin=False, cmd_channel=""):
         rss = rss[rss.rfind("<item>"): rss.rfind("</item>")+7]
         download = rss[rss.find("<link>")+6: rss.find("</link>")]
         description = rss[rss.find("<description>")+13: rss.find("</description>")]
-        description = description.replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "")  # remove p tags
+        description = description.replace("&lt;p&gt;", "").replace("&lt;/p&gt;", "\n")  # remove p tags
         description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove b tags
         description = description.replace("&lt;b&gt;", "*").replace("&lt;/b&gt;", "*")  # remove u tags
 
