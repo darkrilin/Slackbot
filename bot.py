@@ -14,29 +14,30 @@ import json
 
 def get_channels():
     channels = client.api_call("channels.list", token=DEBUG_TOKEN)
-    return channels
+    if channels['ok']:
+        return channels
+    else:
+        print(channels['error'])
+        raise RuntimeError
 
 
 def get_channel_names():
-    channels = get_channels()
     names = []
-    for i in channels["channels"]:
+    for i in CHANNELS["channels"]:
         if not i["is_archived"]:
             names.append(i["name"], i["id"])
     return names
 
 
 def get_channel_id(channel_name):
-    channels = get_channels()
-    for i in channels["channels"]:
+    for i in CHANNELS["channels"]:
         if i["name"] == channel_name:
             return i["id"]
     return None
 
 
 def get_channel_name(channel_id):
-    channels = get_channels()
-    for i in channels["channels"]:
+    for i in CHANNELS["channels"]:
         if i["id"] == channel_id:
             return i["name"]
     return None
@@ -44,22 +45,23 @@ def get_channel_name(channel_id):
 
 def get_users():
     users = client.api_call("users.list", token=DEBUG_TOKEN)
-    return users
+    if users['ok']:
+        return users
+    else:
+        print(users['error'])
+        raise RuntimeError
 
 
 def get_user_names():
-    users = get_users()
     names = []
-    for i in users["members"]:
+    for i in USERS["members"]:
         names.append(i["name"])
     return names
 
 
 def get_admins():
-    users = get_users()
     names = []
-    print(users)
-    for i in users["members"]:
+    for i in USERS["members"]:
         if "is_admin" in i:
             if i["is_admin"]:
                 names.append(i["name"])
@@ -67,16 +69,14 @@ def get_admins():
 
 
 def get_user_id(user_name):
-    users = get_users()
-    for i in users["members"]:
+    for i in USERS["members"]:
         if i["name"] == user_name:
             return i["id"]
     return None
 
 
 def get_user_name(user_id):
-    users = get_users()
-    for i in users["members"]:
+    for i in USERS["members"]:
         if i["id"] == user_id:
             return i["name"]
     return None
@@ -90,8 +90,6 @@ def get_rules():
 
 
 def get_joke():
-    jokes = bytes.decode(request.urlopen("https://pastebin.com/raw/qvucRTSE").read())  # TODO: Same here
-    jokes = jokes.split("\r\n***\r\n")
     return choice(jokes)
 
 
@@ -109,10 +107,13 @@ def welcome_user(user_id="", channel_id=""):
     client.api_call("chat.postMessage", channel=user_id, text=resp["intro"][0], as_user=True)
 
 
-def studio_update(force_print=False, admin=False):
+def studio_update(force_print=False, admin=False, cmd_channel=""):
     update = json.loads(bytes.decode(request.urlopen("http://gmapi.gnysek.pl/version/gm2ide").read()))
     version = update["gm2ide"]["version"]
     days_ago = update["gm2ide"]["daysAgo"]
+
+    if cmd_channel == "":
+        cmd_channel = get_channel_id("lounge")
 
     if days_ago <= 1 or (force_print and admin):
         rss = bytes.decode(request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
@@ -149,7 +150,7 @@ def studio_update(force_print=False, admin=False):
             }
         ]
 
-        client.api_call("chat.postMessage", as_user=True, channel=get_channel_id("lounge"),
+        client.api_call("chat.postMessage", as_user=True, channel=cmd_channel,
                         text="", attachments=json.dumps(attachments))
         print("gms2 has updated to version {}\n".format(version))
         if admin:
@@ -188,31 +189,34 @@ def parse_slack_output(slack_rtm_output):
     return None, None, None
 
 
-def handle_command(command, channel, caller):
-    user_name = get_user_name(caller)
+def handle_command(cmd, cmd_channel, cmd_caller):
+    user_name = get_user_name(cmd_caller)
     is_admin = user_name in get_admins()
 
     response = choice(resp["unsure"])
+    cmd = cmd.lower()
 
-    if "rules" in command.lower():
-        client.api_call("chat.postMessage", channel=caller, text=get_rules(), as_user=True)
+    if "rules" in cmd:
+        client.api_call("chat.postMessage", channel=cmd_caller, text=get_rules(), as_user=True)
         response = choice(resp["rules_response"])
 
-    elif "joke" in command.lower():
+    elif "joke" in cmd:
         response = get_joke()
 
-    elif "update" in command.lower():
+    elif "update" in cmd:
         if is_admin:
             force = False
-            if "force" in command.lower():
-                force = True
-            if studio_update(admin=True, force_print=force):
+            chnnl = ""
+            if "force" in cmd: force = True
+            if "local" in cmd: chnnl = cmd_channel
+
+            if studio_update(admin=True, force_print=force, cmd_channel=chnnl):
                 response = "GMS2 updated!"
             else:
                 response = "No updates found"
 
     if response != "":
-        client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+        client.api_call("chat.postMessage", channel=cmd_channel, text=response, as_user=True)
 
 
 if __name__ == "__main__":
@@ -220,6 +224,10 @@ if __name__ == "__main__":
     HOSTED = int(getenv("SLACK_HOSTED", 0))
     BOT_ID = getenv("SLACK_BOT_ID", None)
     BOT_NAME = "<@" + str(BOT_ID) + ">"
+
+    USERS = {}
+    CHANNELS = {}
+    ADMINS = {}
 
     DEBUG_TOKEN = environ["SLACK_TEST_TOKEN"]
     WEBSOCKET_DELAY = .5
@@ -229,13 +237,20 @@ if __name__ == "__main__":
     with open("data/responses.json") as data_file:
         resp = json.load(data_file)
 
+    with open("data/jokes.json") as data_file:
+        jokes = json.load(data_file)['jokes']
+
     if client.rtm_connect():
         print("\n----- BOT STARTING -----")
 
-        if HOSTED:
-            client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="Starting", as_user=True)
+        USERS = get_users()
+        CHANNELS = get_channels()
+        ADMINS = get_admins()
 
-        # studio_update()
+        if HOSTED:
+            client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="`Starting on server...`", as_user=1)
+        else:
+            client.api_call("chat.postMessage", channel=get_user_id("rilin"), text="`Starting locally...`", as_user=1)
 
         while True:
             command, channel, caller = parse_slack_output(client.rtm_read())
