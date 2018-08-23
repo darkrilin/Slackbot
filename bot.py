@@ -111,7 +111,7 @@ def welcome_user(user_id="", channel_id=""):
 
 
 def studio_update(force_print=False, admin=False, cmd_channel=""):
-    update = json.loads(bytes.decode(request.urlopen("http://gmapi.gnysek.pl/version/gm2ide").read()))
+    update = json.loads(bytes.decode(urllib.request.urlopen("http://gmapi.gnysek.pl/version/gm2ide").read()))
     version = update["gm2ide"]["version"]
     days_ago = update["gm2ide"]["daysAgo"]
 
@@ -119,7 +119,7 @@ def studio_update(force_print=False, admin=False, cmd_channel=""):
         cmd_channel = get_channel_id("lounge")
 
     if days_ago <= 1 or (force_print and admin):
-        rss = bytes.decode(request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
+        rss = bytes.decode(urllib.request.urlopen("http://gms.yoyogames.com/update-win.rss").read())
         rss = rss[rss.rfind("<item>"): rss.rfind("</item>")+7]
         download = rss[rss.find("<link>")+6: rss.find("</link>")]
         description = rss[rss.find("<description>")+13: rss.find("</description>")]
