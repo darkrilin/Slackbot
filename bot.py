@@ -2,11 +2,12 @@
 # meta, created by @darkrilin
 # for the gamemakerdevs slack community
 #
+# https://rtay.io
 ##
 
 from slackclient import SlackClient
 from os import environ, getenv
-from urllib import request
+import urllib.request
 from random import choice
 from time import sleep
 import json
@@ -83,9 +84,11 @@ def get_user_name(user_id):
 
 
 def get_rules():
-    # Fetch rules hosted from pastebin
-    # TODO: Move these over to something like an amazon S3 instance or a server where I host my own files
-    rules = bytes.decode(request.urlopen("https://pastebin.com/raw/Hm5hHjbB").read())
+    # Fetch rules from hosted file
+    url = 'https://rtay.io/gmslack/rules.txt'
+    headers = {"User-Agent": "Python 3.6.6"}
+    req = urllib.request.Request(url, headers=headers)
+    rules = urllib.request.urlopen(req).read().decode('utf-8')
     return rules
 
 
@@ -216,11 +219,13 @@ def handle_command(cmd, cmd_channel, cmd_caller):
     elif "update" in cmd:
         if is_admin:
             force = False
-            chnnl = ""
-            if "force" in cmd: force = True
-            if "local" in cmd: chnnl = cmd_channel
+            ch = ""
+            if "force" in cmd:
+                force = True
+            if "local" in cmd:
+                ch = cmd_channel
 
-            if studio_update(admin=True, force_print=force, cmd_channel=chnnl):
+            if studio_update(admin=True, force_print=force, cmd_channel=ch):
                 response = "GMS2 updated!"
             else:
                 response = "No updates found"
@@ -230,7 +235,6 @@ def handle_command(cmd, cmd_channel, cmd_caller):
 
 
 if __name__ == "__main__":
-
     HOSTED = int(getenv("SLACK_HOSTED", 0))
     BOT_ID = getenv("SLACK_BOT_ID", None)
     BOT_NAME = "<@" + str(BOT_ID) + ">"
@@ -240,7 +244,7 @@ if __name__ == "__main__":
     ADMINS = {}
 
     DEBUG_TOKEN = environ["SLACK_TEST_TOKEN"]
-    WEBSOCKET_DELAY = .5
+    WEB_SOCKET_DELAY = .5
 
     client = SlackClient(getenv("SLACK_BOT_TOKEN", 0))
 
@@ -267,7 +271,7 @@ if __name__ == "__main__":
             if command and channel:
                 print(channel, caller, command)
                 handle_command(command, channel, caller)
-            sleep(WEBSOCKET_DELAY)
+            sleep(WEB_SOCKET_DELAY)
 
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
